@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
 @Component({
-  selector: 'lib-ngx-calendar-lib',
+  selector: 'ngx-calendar',
   template: `
     <p>
       ngx-calendar-lib works!
