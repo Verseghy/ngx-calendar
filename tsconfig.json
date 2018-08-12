@@ -16,6 +16,14 @@
     "lib": [
       "es2017",
       "dom"
-    ]
+    ],
+    "paths": {
+      "ngx-calendar-lib": [
+        "dist/ngx-calendar-lib"
+      ],
+      "ngx-calendar-lib/*": [
+        "dist/ngx-calendar-lib/*"
+      ]
+    }
   }
 }
