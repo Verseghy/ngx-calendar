@@ -8,3 +8,4 @@ cache:
 script:
 - npm run lint
 - travis_wait 30 npm run ng build -- --prod
+- travis_wait 30 npm run ng build ngx-calendar-lib -- --prod
