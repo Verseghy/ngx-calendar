@@ -22,13 +22,16 @@ export class Cell {
     private _rows: {
         id: number;
         free: boolean;
-    }[];
-    private _date: number;
+        title: string;
+    }[] = [];
+    private _day: number;
+    private _date: Date;
     private _today: boolean;
 
-    constructor(date: number, today: boolean) {
-        this._date = date;
+    constructor(day: number, today: boolean, date: Date) {
+        this._day = day;
         this._today = today;
+        this._date = date;
     }
 
     get firstFreeRow(): number {
@@ -37,28 +40,46 @@ export class Cell {
                 return item.id;
             }
         }
-        return 0;
+        return this._rows.length;
     }
 
-    set row(n: number) {
-        if (this._rows[n]) {
-            this._rows[n].free = false;
-        } else {
-            for (const _ of Array(n - this._rows.length + 1)) {
-                this._rows.push({
-                    id: this._rows.length,
-                    free: true
-                });
-            }
-            this._rows[n].free = false;
-        }
-    }
-
-    get date(): number {
-        return this._date;
+    get day(): number {
+        return this._day;
     }
 
     get today(): boolean {
         return this._today;
+    }
+
+    get date(): Date {
+        return this._date;
+    }
+
+    get events(){
+        let events = [];
+        for(const item of Object.keys(this._rows)){
+            if(!this._rows[item].free){
+                let top = Number(item) * 24;
+                events.push({title:this._rows[item].title, top: top});
+            }
+        }
+        return events;
+    }
+
+    public push(row: number, title: string){
+        if (this._rows[row]) {
+            this._rows[row].free = false;
+            this._rows[row].title = title;
+        } else {
+            for (const _ of Array(row - this._rows.length + 1)) {
+                this._rows.push({
+                    id: this._rows.length,
+                    free: true,
+                    title: ''
+                });
+            }
+            this._rows[row].free = false;
+            this._rows[row].title = title;
+        }
     }
 }
