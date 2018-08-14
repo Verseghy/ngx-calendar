@@ -1,1 +1,15 @@
-<div *ngFor="let _ of ' '.repeat(42).split('')" #cellElement class="cellElement">Test</div>
+<button class="next" (click)="prevMonth()">&lt;</button>
+<button class="prev" (click)="nextMonth()">&gt;</button>
+<div class="grid">
+  <div class="cellElement">Hétfő</div>
+  <div class="cellElement">Kedd</div>
+  <div class="cellElement">Szerda</div>
+  <div class="cellElement">Csütörtök</div>
+  <div class="cellElement">Péntek</div>
+  <div class="cellElement">Szombat</div>
+  <div class="cellElement">Vasárnap</div>
+  <div *ngFor="let cell of cells" class="cellElement">
+    <span class="date">{{ cell.date }}</span>
+    <div class="events"></div>
+  </div>
+</div>

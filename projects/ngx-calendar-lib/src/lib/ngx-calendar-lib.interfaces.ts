@@ -1,3 +1,5 @@
+import { ElementRef } from "@angular/core";
+
 export class Event {
     private _id: number;
     private _title: string;
@@ -17,28 +19,14 @@ export class Event {
 }
 
 export class Cell {
-    private _x: number;
-    private _y: number;
     private _rows: {
         id: number;
         free: boolean;
     }[];
+    private _date: number;
 
-    constructor(x: number, y: number) {
-        this._x = x;
-        this._y = y;
-    }
-
-    get x(): number {
-        return this._x;
-    }
-
-    set x(n: number) {
-        this._x = n;
-    }
-
-    get y(): number {
-        return this._y;
+    constructor(date: number) {
+        this._date = date;
     }
 
     get firstFreeRow(): number {
@@ -62,5 +50,9 @@ export class Cell {
             }
             this._rows[n].free = false;
         }
+    }
+
+    get date(): number {
+        return this._date;
     }
 }
