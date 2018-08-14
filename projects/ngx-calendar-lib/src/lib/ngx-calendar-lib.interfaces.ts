@@ -23,6 +23,7 @@ export class Cell {
         id: number;
         free: boolean;
         title: string;
+        width: number;
     }[] = [];
     private _day: number;
     private _date: Date;
@@ -58,28 +59,31 @@ export class Cell {
     get events(){
         let events = [];
         for(const item of Object.keys(this._rows)){
-            if(!this._rows[item].free){
+            if(!this._rows[item].free && this._rows[item].title !== ''){
                 let top = Number(item) * 24;
-                events.push({title:this._rows[item].title, top: top});
+                events.push({title:this._rows[item].title, top: top, width: this._rows[item].width});
             }
         }
         return events;
     }
 
-    public push(row: number, title: string){
+    public push(row: number, title: string, width: number){
         if (this._rows[row]) {
             this._rows[row].free = false;
             this._rows[row].title = title;
+            this._rows[row].width = width;
         } else {
             for (const _ of Array(row - this._rows.length + 1)) {
                 this._rows.push({
                     id: this._rows.length,
                     free: true,
-                    title: ''
+                    title: '',
+                    width: 0
                 });
             }
             this._rows[row].free = false;
             this._rows[row].title = title;
+            this._rows[row].width = width;
         }
     }
 }

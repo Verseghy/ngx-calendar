@@ -1,6 +1,6 @@
-import {Component, OnInit, ViewChildren, AfterViewInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChildren, AfterViewInit, ViewChild } from '@angular/core';
 import { Cell } from './ngx-calendar-lib.interfaces';
-import { getDay, lastDayOfMonth, startOfWeek, addDays, subMonths, startOfMonth, getDate, addMonths, getDaysInMonth, format, isToday, parse, getMonth } from 'date-fns';
+import { getDay, lastDayOfMonth, startOfWeek, addDays, subMonths, startOfMonth, getDate, addMonths, getDaysInMonth, format, isToday, parse, getMonth, isBefore, isEqual, differenceInDays } from 'date-fns';
 
 @Component({
   selector: 'ngx-calendar',
@@ -13,15 +13,15 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   private _date = new Date(2018, 7, 1);
 
   public events = [
-    {"date":"2018-08-1","title":"asd"},
-    {"date":"2018-08-1","title":"asd2"},
-    {"date":"2018-08-5","title":"asd"},
-    {"date":"2018-08-8","title":"asd"},
-    {"date":"2018-08-14","title":"asd"},
-    {"date":"2018-08-21","title":"asd"},
-    {"date":"2018-08-27","title":"asd"},
-    {"date":"2018-08-28","title":"asd"},
-    {"date":"2018-08-30","title":"asd"}
+    { "dateFrom": "2018-08-01", dateTo: "2018-08-02", "title": "asd" },
+    { "dateFrom": "2018-08-01", dateTo: "2018-08-01", "title": "asd2" },
+    { "dateFrom": "2018-08-05", dateTo: "2018-08-05", "title": "asd" },
+    { "dateFrom": "2018-08-08", dateTo: "2018-08-08", "title": "asd" },
+    { "dateFrom": "2018-08-14", dateTo: "2018-08-14", "title": "asd" },
+    { "dateFrom": "2018-08-21", dateTo: "2018-08-21", "title": "asd" },
+    { "dateFrom": "2018-08-27", dateTo: "2018-08-27", "title": "asd" },
+    { "dateFrom": "2018-08-28", dateTo: "2018-08-28", "title": "asd" },
+    { "dateFrom": "2018-08-30", dateTo: "2018-08-30", "title": "asd" }
   ]
 
   constructor() { }
@@ -42,25 +42,42 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
     let firstDay = addDays(startOfWeek(lastDayOfMonth(subMonths(this.date, 1))), 1);
     let prevMonth = getDaysInMonth(subMonths(this.date, 1)) - getDate(firstDay);
 
-    if(getDay(lastDayOfMonth(subMonths(this.date, 1))) === 0){
+    if (getDay(lastDayOfMonth(subMonths(this.date, 1))) === 0) {
       firstDay = startOfMonth(this.date);
       prevMonth = 0;
     }
 
-    if((getDay(startOfMonth(this.date)) === 0 && getDaysInMonth(this.date) >= 30) || (getDay(startOfMonth(this.date)) === 6 && getDaysInMonth(this.date) === 31)){
+    if ((getDay(startOfMonth(this.date)) === 0 && getDaysInMonth(this.date) >= 30) || (getDay(startOfMonth(this.date)) === 6 && getDaysInMonth(this.date) === 31)) {
       rows = 6;
     }
 
-    for(let index = 0;index < 7 * rows; index++){
+    for (let index = 0; index < 7 * rows; index++) {
       this._cells.push(new Cell(getDate(firstDay), isToday(firstDay), firstDay));
       firstDay = addDays(firstDay, 1);
     };
 
-    for(const item of this.events){
-      if(getMonth(parse(item.date)) == getMonth(this.date)){
-        let cell = this.cells[getDate(parse(item.date)) + prevMonth];
-        cell.push(cell.firstFreeRow, item.title);
-        console.log(cell.events);
+    for (const item of this.events) {
+      if (getMonth(parse(item.dateFrom)) == getMonth(this.date)) {
+        if (isBefore(item.dateFrom, item.dateTo)) {
+          let rows = [];
+          for (let i = 0; i <= Math.abs(differenceInDays(item.dateFrom, item.dateTo)); i++) {
+            const cell = this.cells[getDate(addDays(parse(item.dateFrom), i)) + prevMonth];
+            rows.push(cell.firstFreeRow);
+          }
+          let row = Math.max(...rows);
+          for (let i = 0; i <= Math.abs(differenceInDays(item.dateFrom, item.dateTo)); i++) {
+            const cell = this.cells[getDate(addDays(parse(item.dateFrom), i)) + prevMonth];
+            if(i === 0){
+              cell.push(row, item.title, Math.abs(differenceInDays(item.dateFrom, item.dateTo)) + 1);
+            }else {
+              cell.push(row, '', 0);
+            }
+          }
+          console.log(row)
+        } else if (isEqual(item.dateFrom, item.dateTo)) {
+          let cell = this.cells[getDate(parse(item.dateFrom)) + prevMonth];
+          cell.push(cell.firstFreeRow, item.title, 1);
+        }
       }
     }
   }
@@ -68,7 +85,7 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   get date() {
     return this._date;
   }
-  
+
   get formatedDate() {
     return format(this.date, 'YYYY MMMM');
   }
