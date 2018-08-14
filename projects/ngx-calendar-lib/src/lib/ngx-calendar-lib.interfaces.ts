@@ -24,9 +24,11 @@ export class Cell {
         free: boolean;
     }[];
     private _date: number;
+    private _today: boolean;
 
-    constructor(date: number) {
+    constructor(date: number, today: boolean) {
         this._date = date;
+        this._today = today;
     }
 
     get firstFreeRow(): number {
@@ -54,5 +56,9 @@ export class Cell {
 
     get date(): number {
         return this._date;
+    }
+
+    get today(): boolean {
+        return this._today;
     }
 }

@@ -1,14 +1,17 @@
-<button class="next" (click)="prevMonth()">&lt;</button>
-<button class="prev" (click)="nextMonth()">&gt;</button>
+<div class="controls">
+  <button class="next" (click)="prevMonth()">&lt;</button>
+  <button class="prev" (click)="nextMonth()">&gt;</button>
+  <span class="month">{{ formatedDate }}</span>
+</div>
 <div class="grid">
-  <div class="cellElement">Hétfő</div>
-  <div class="cellElement">Kedd</div>
-  <div class="cellElement">Szerda</div>
-  <div class="cellElement">Csütörtök</div>
-  <div class="cellElement">Péntek</div>
-  <div class="cellElement">Szombat</div>
-  <div class="cellElement">Vasárnap</div>
-  <div *ngFor="let cell of cells" class="cellElement">
+  <div class="cellElement header">H</div>
+  <div class="cellElement header">K</div>
+  <div class="cellElement header">Sze</div>
+  <div class="cellElement header">Cs</div>
+  <div class="cellElement header">P</div>
+  <div class="cellElement header">Szo</div>
+  <div class="cellElement header">V</div>
+  <div *ngFor="let cell of cells" class="cellElement" [ngClass]="{'today' : cell.today}">
     <span class="date">{{ cell.date }}</span>
     <div class="events"></div>
   </div>

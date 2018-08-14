@@ -1,6 +1,6 @@
-import {Component, OnInit, ViewChildren, AfterViewInit} from '@angular/core';
+import {Component, OnInit, ViewChildren, AfterViewInit, ViewChild} from '@angular/core';
 import { Event, Cell } from './ngx-calendar-lib.interfaces';
-import { getDay, lastDayOfMonth, startOfWeek, addDays, subMonths, startOfMonth, getDate, addMonths } from 'date-fns';
+import { getDay, lastDayOfMonth, startOfWeek, addDays, subMonths, startOfMonth, getDate, addMonths, getDaysInMonth, format, isToday } from 'date-fns';
 import { QueryList } from '@angular/core/src/render3';
 
 @Component({
@@ -19,24 +19,36 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this._changeMonth();
-    console.log(this._cells);
+    setTimeout(() => {
+      this._changeMonth();
+    })
   }
 
   private _changeMonth() {
+    let rows = 5;
     this._cells = [];
     let firstDay = addDays(startOfWeek(lastDayOfMonth(subMonths(this.date, 1))), 1);
+
     if(getDay(lastDayOfMonth(subMonths(this.date, 1))) === 0){
       firstDay = startOfMonth(this.date);
     }
-    for(let index = 0;index < 42; index++){
-      this._cells.push(new Cell(getDate(firstDay)));
+
+    if((getDay(startOfMonth(this.date)) === 0 && getDaysInMonth(this.date) >= 30) || (getDay(startOfMonth(this.date)) === 6 && getDaysInMonth(this.date) === 31)){
+      rows = 6;
+    }
+
+    for(let index = 0;index < 7 * rows; index++){
+      this._cells.push(new Cell(getDate(firstDay), isToday(firstDay)));
       firstDay = addDays(firstDay, 1);
     };
   }
 
   get date() {
     return this._date;
+  }
+  
+  get formatedDate() {
+    return format(this.date, 'YYYY MMMM');
   }
 
   set date(date: Date) {
