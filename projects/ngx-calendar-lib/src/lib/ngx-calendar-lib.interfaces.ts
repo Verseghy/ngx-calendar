@@ -61,7 +61,8 @@ export class Cell {
         for(const item of Object.keys(this._rows)){
             if(!this._rows[item].free && this._rows[item].title !== ''){
                 let top = Number(item) * 24;
-                events.push({title:this._rows[item].title, top: top, width: this._rows[item].width});
+                let width = 'calc(' + this._rows[item].width*100 + '% + ' + (this._rows[item].width - 5) + 'px)';
+                events.push({title:this._rows[item].title, top: top, width: width});
             }
         }
         return events;

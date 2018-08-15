@@ -13,6 +13,7 @@
     grid-template-rows: 20px auto;
     border-left: #e0e0e0 1px solid;
     border-top: #e0e0e0 1px solid;
+    box-sizing: border-box;
 }
 
 .cellElement {
@@ -42,7 +43,7 @@
 .event {
     position: absolute;
     top: 0;
-    left: 0;
+    left: 2px;
     width: 100%;
     background-color: #3f51b5;
     height: 22px;
