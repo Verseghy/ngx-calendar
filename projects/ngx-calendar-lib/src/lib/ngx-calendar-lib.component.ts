@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChildren, AfterViewInit, ViewChild } from '@angular/core';
 import { Cell } from './ngx-calendar-lib.interfaces';
-import { getDay, lastDayOfMonth, startOfWeek, addDays, subMonths, startOfMonth, getDate, addMonths, getDaysInMonth, format, isToday, parse, getMonth, isBefore, isEqual, differenceInDays, isSunday } from 'date-fns';
+import { getDay, lastDayOfMonth, startOfWeek, addDays, subMonths, startOfMonth, getDate, addMonths, getDaysInMonth, format, isToday, parse, getMonth, isBefore, isAfter, isEqual, differenceInDays, isSunday, endOfMonth, endOfWeek, subDays } from 'date-fns';
 
 @Component({
   selector: 'ngx-calendar',
@@ -13,17 +13,19 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   private _date = new Date(2018, 7, 1);
 
   public events = [
-    { "id":"0", "dateFrom": "2018-07-30", dateTo: "2018-07-30", "color": "#7986cb", "title": "asd" },
+    /*{ "id":"0", "dateFrom": "2018-07-30", dateTo: "2018-07-30", "color": "#7986cb", "title": "asd" },
     { "id":"1", "dateFrom": "2018-07-24", dateTo: "2018-08-2", "color": "#33b679", "title": "asd" },
     { "id":"2", "dateFrom": "2018-08-01", dateTo: "2018-08-21", "color": "#33b679", "title": "asd" },
     { "id":"3", "dateFrom": "2018-08-01", dateTo: "2018-08-02", "color": "#3f51b5", "title": "asd2" },
     { "id":"4", "dateFrom": "2018-08-05", dateTo: "2018-08-05", "color": "#7986cb", "title": "asd" },
     { "id":"5", "dateFrom": "2018-08-08", dateTo: "2018-08-08", "color": "#039be5", "title": "asd" },
-    { "id":"6", "dateFrom": "2018-08-14", dateTo: "2018-08-14", "color": "#3f51b5", "title": "asd" },
+    { "id":"6", "dateFrom": "2018-08-14", dateTo: "2018-08-17", "color": "#d50000", "title": "asd" },
     { "id":"7", "dateFrom": "2018-08-21", dateTo: "2018-08-21", "color": "#3f51b5", "title": "asd" },
     { "id":"8", "dateFrom": "2018-08-27", dateTo: "2018-08-28", "color": "#039be5", "title": "asd" },
     { "id":"9", "dateFrom": "2018-08-28", dateTo: "2018-08-28", "color": "#7986cb", "title": "asd" },
-    { "id":"10", "dateFrom": "2018-08-30", dateTo: "2018-08-30", "color": "#7986cb", "title": "asd" }
+    { "id":"10", "dateFrom": "2018-08-30", dateTo: "2018-09-24", "color": "#7986cb", "title": "asd" },
+    { "id":"11", "dateFrom": "2018-07-30", dateTo: "2018-09-2", "color": "#7986cb", "title": "asdasd" }*/
+    { "id":"11", "dateFrom": "2018-07-30", dateTo: "2018-09-2", "color": "#7986cb", "title": "asdasd" }
   ]
 
   private _events = [];
@@ -76,21 +78,20 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
     }
 
     for (let index = 0; index < 7 * rows; index++) {
-      this._cells.push(new Cell(getDate(firstDay), isToday(firstDay), firstDay));
-      firstDay = addDays(firstDay, 1);
+      this._cells.push(new Cell(getDate(addDays(firstDay, index)), isToday(addDays(firstDay, index)), addDays(firstDay, index)));
     };
 
     for (const item of this._events) {
-      if (getMonth(parse(item.dateFrom)) == getMonth(this.date)) {
+      if(isAfter(item.dateFrom, subDays(firstDay, 1)) && isBefore(item.dateTo, addDays(endOfWeek(endOfMonth(this.date)), 1))){
         if (isBefore(item.dateFrom, item.dateTo)) {
           let rows = [];
           for (let i = 0; i <= Math.abs(differenceInDays(item.dateFrom, item.dateTo)); i++) {
-            const cell = this.cells[getDate(addDays(parse(item.dateFrom), i)) + prevMonth];
+            const cell = this.cells[Math.abs(differenceInDays(addDays(parse(item.dateFrom), 1), firstDay))];
             rows.push(cell.firstFreeRow);
           }
           let row = Math.max(...rows);
           for (let i = 0; i <= Math.abs(differenceInDays(item.dateFrom, item.dateTo)); i++) {
-            const cell = this.cells[getDate(addDays(parse(item.dateFrom), i)) + prevMonth];
+            const cell = this.cells[Math.abs(differenceInDays(addDays(parse(item.dateFrom), i), firstDay))];
             if (i === 0) {
               cell.push(row, item.title, Math.abs(differenceInDays(item.dateFrom, item.dateTo)) + 1, item.color);
             } else {
@@ -98,7 +99,7 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
             }
           }
         } else if (isEqual(item.dateFrom, item.dateTo)) {
-          let cell = this.cells[getDate(parse(item.dateFrom)) + prevMonth];
+          let cell = this.cells[Math.abs(differenceInDays(parse(item.dateFrom), firstDay))];
           cell.push(cell.firstFreeRow, item.title, 1, item.color);
         }
       }
