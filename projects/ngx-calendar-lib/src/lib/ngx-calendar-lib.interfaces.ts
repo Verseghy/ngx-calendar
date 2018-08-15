@@ -24,6 +24,7 @@ export class Cell {
         free: boolean;
         title: string;
         width: number;
+        color: string;
     }[] = [];
     private _day: number;
     private _date: Date;
@@ -62,29 +63,32 @@ export class Cell {
             if(!this._rows[item].free && this._rows[item].title !== ''){
                 let top = Number(item) * 24;
                 let width = 'calc(' + this._rows[item].width*100 + '% + ' + (this._rows[item].width - 5) + 'px)';
-                events.push({title:this._rows[item].title, top: top, width: width});
+                events.push({title:this._rows[item].title, top: top, width: width, color: this._rows[item].color});
             }
         }
         return events;
     }
 
-    public push(row: number, title: string, width: number){
+    public push(row: number, title: string, width: number, color: string){
         if (this._rows[row]) {
             this._rows[row].free = false;
             this._rows[row].title = title;
             this._rows[row].width = width;
+            this._rows[row].color = color;
         } else {
             for (const _ of Array(row - this._rows.length + 1)) {
                 this._rows.push({
                     id: this._rows.length,
                     free: true,
                     title: '',
-                    width: 0
+                    width: 0,
+                    color: ''
                 });
             }
             this._rows[row].free = false;
             this._rows[row].title = title;
             this._rows[row].width = width;
+            this._rows[row].color = color;
         }
     }
 }
