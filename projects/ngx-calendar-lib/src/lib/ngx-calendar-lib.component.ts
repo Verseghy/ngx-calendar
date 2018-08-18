@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChildren, AfterViewInit, ViewChild } from '@angular/core';
-import { Cell } from './ngx-calendar-lib.interfaces';
+import { Cell, Event } from './ngx-calendar-lib.interfaces';
 import { getDay, lastDayOfMonth, startOfWeek, addDays, subMonths, startOfMonth, getDate, addMonths, getDaysInMonth, format, isToday, parse, getMonth, isBefore, isAfter, isEqual, differenceInDays, isSunday, endOfMonth, endOfWeek, subDays } from 'date-fns';
 
 @Component({
@@ -10,25 +10,11 @@ import { getDay, lastDayOfMonth, startOfWeek, addDays, subMonths, startOfMonth, 
 export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
 
   private _cells: Cell[] = [];
-  private _date = new Date(2018, 7, 1);
+  private _date = new Date();
 
-  public events = [
-    /*{ "id":"0", "dateFrom": "2018-07-30", dateTo: "2018-07-30", "color": "#7986cb", "title": "asd" },
-    { "id":"1", "dateFrom": "2018-07-24", dateTo: "2018-08-2", "color": "#33b679", "title": "asd" },
-    { "id":"2", "dateFrom": "2018-08-01", dateTo: "2018-08-21", "color": "#33b679", "title": "asd" },
-    { "id":"3", "dateFrom": "2018-08-01", dateTo: "2018-08-02", "color": "#3f51b5", "title": "asd2" },
-    { "id":"4", "dateFrom": "2018-08-05", dateTo: "2018-08-05", "color": "#7986cb", "title": "asd" },
-    { "id":"5", "dateFrom": "2018-08-08", dateTo: "2018-08-08", "color": "#039be5", "title": "asd" },
-    { "id":"6", "dateFrom": "2018-08-14", dateTo: "2018-08-17", "color": "#d50000", "title": "asd" },
-    { "id":"7", "dateFrom": "2018-08-21", dateTo: "2018-08-21", "color": "#3f51b5", "title": "asd" },
-    { "id":"8", "dateFrom": "2018-08-27", dateTo: "2018-08-28", "color": "#039be5", "title": "asd" },
-    { "id":"9", "dateFrom": "2018-08-28", dateTo: "2018-08-28", "color": "#7986cb", "title": "asd" },
-    { "id":"10", "dateFrom": "2018-08-30", dateTo: "2018-09-24", "color": "#7986cb", "title": "asd" },
-    { "id":"11", "dateFrom": "2018-07-30", dateTo: "2018-09-2", "color": "#7986cb", "title": "asdasd" }*/
-    { "id":"11", "dateFrom": "2018-07-30", dateTo: "2018-09-2", "color": "#7986cb", "title": "asdasd" }
-  ]
+  private _events: Event[] = [];
 
-  private _events = [];
+  private _events2 = [];
 
   constructor() { }
 
@@ -36,28 +22,67 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this._generateEvents();
     setTimeout(() => {
       this._changeMonth();
-    })
+      let asd = [];
+      asd.push(new Event(0, 'asd1', 'asdasd', new Date(), addDays(new Date(), 0), '#0B8043'));
+      asd.push(new Event(1, 'asd2', 'asdasd', new Date(), addDays(new Date(), 1), '#D50000'));
+      this.setEvents(asd);
+      console.log(this._events2);
+    });
   }
 
 
   private _generateEvents(){
-    for (const item of Object.keys(this.events)) {
-      if (isBefore(this.events[item].dateFrom, this.events[item].dateTo)) {
+    this._events2 = [];
+    for (const item of Object.keys(this._events)) {
+      if (isBefore(this._events[item].startDate, this._events[item].endDate)) {
         let events = [];
-        let start = this.events[item].dateFrom;
-        for (let i = 0; i <= Math.abs(differenceInDays(this.events[item].dateFrom, this.events[item].dateTo)); i++) {
-          if(isSunday(addDays(this.events[item].dateFrom, i))){
-            events.push({id: this.events[item].id, dateFrom: start, dateTo: format(addDays(this.events[item].dateFrom, i), 'YYYY-MM-DD'), color: this.events[item].color, title: this.events[item].title})
-            start = format(addDays(this.events[item].dateFrom, i + 1), 'YYYY-MM-DD');
+        let eventStartDate = this._events[item].startDate;
+        for (let i = 0; i <= Math.abs(differenceInDays(this._events[item].startDate, this._events[item].endDate)); i++) {
+          if(isSunday(addDays(this._events[item].startDate, i)) && (format(addDays(this._events[item].startDate, i), 'YYYY-MM-DD') !== format(this._events[item].endDate, 'YYYY-MM-DD'))){
+            events.push({id: this._events[item].id, title: this._events[item].title, startDate: eventStartDate, endDate: addDays(this._events[item].startDate, i), color: this._events[item].color})
+            eventStartDate = addDays(this._events[item].startDate, i + 1);
           }
+        } 
+        events.push({id: this._events[item].id, title: this._events[item].title, startDate: eventStartDate, endDate: this._events[item].endDate, color: this._events[item].color})
+        this._events2.push(...events);
+      }else if(isEqual(this._events[item].startDate, this._events[item].endDate)){
+        this._events2.push({id: this._events[item].id, title: this._events[item].title, startDate: this._events[item].startDate, endDate: this._events[item].endDate, color: this._events[item].color});
+      }
+    }
+    this._renderEvents();
+  }
+
+  private _renderEvents(){
+    let firstDay = addDays(startOfWeek(lastDayOfMonth(subMonths(this.date, 1))), 1);
+
+    if (getDay(lastDayOfMonth(subMonths(this.date, 1))) === 0) {
+      firstDay = startOfMonth(this.date);
+    }
+
+    for (const item of this._events2) {
+      if(isAfter(item.startDate, subDays(firstDay, 1)) && isBefore(item.endDate, addDays(endOfWeek(endOfMonth(this.date)), 1))){
+        if (isBefore(item.startDate, item.endDate)) {
+          let rows = [];
+          for (let i = 0; i <= Math.abs(differenceInDays(item.startDate, item.endDate)); i++) {
+            const cell = this._cells[Math.abs(differenceInDays(addDays(parse(item.startDate), 1), firstDay))];
+            rows.push(cell.firstFreeRow);
+          }
+          let row = Math.max(...rows);
+          for (let i = 0; i <= Math.abs(differenceInDays(item.startDate, item.endDate)); i++) {
+            const cell = this._cells[Math.abs(differenceInDays(addDays(parse(item.startDate), i), firstDay))];
+            console.log(cell);
+            if (i === 0) {
+              cell.push(row, item.title, Math.abs(differenceInDays(item.startDate, item.endDate)) + 1, item.color);
+            } else {
+              cell.push(row, '', 0, '');
+            }
+          }
+        } else if (isEqual(format(item.startDate, 'YYYY-MM-DD'), format(item.endDate, 'YYYY-MM-DD'))) {
+          const cell = this._cells[Math.abs(differenceInDays(parse(item.startDate), firstDay))];
+          cell.push(cell.firstFreeRow, item.title, 1, item.color);
         }
-        events.push({id: this.events[item].id, dateFrom: start, dateTo: this.events[item].dateTo, color: this.events[item].color, title: this.events[item].title})
-        this._events.push(...events);
-      }else if(isEqual(this.events[item].dateFrom, this.events[item].dateTo)){
-        this._events.push(this.events[item]);
       }
     }
   }
@@ -77,34 +102,11 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
       rows = 6;
     }
 
-    for (let index = 0; index < 7 * rows; index++) {
-      this._cells.push(new Cell(getDate(addDays(firstDay, index)), isToday(addDays(firstDay, index)), addDays(firstDay, index)));
+    for (let i = 0; i < 7 * rows; i++) {
+      this._cells.push(new Cell(getDate(addDays(firstDay, i)), isToday(addDays(firstDay, i)), addDays(firstDay, i)));
     };
 
-    for (const item of this._events) {
-      if(isAfter(item.dateFrom, subDays(firstDay, 1)) && isBefore(item.dateTo, addDays(endOfWeek(endOfMonth(this.date)), 1))){
-        if (isBefore(item.dateFrom, item.dateTo)) {
-          let rows = [];
-          for (let i = 0; i <= Math.abs(differenceInDays(item.dateFrom, item.dateTo)); i++) {
-            const cell = this.cells[Math.abs(differenceInDays(addDays(parse(item.dateFrom), 1), firstDay))];
-            rows.push(cell.firstFreeRow);
-          }
-          let row = Math.max(...rows);
-          for (let i = 0; i <= Math.abs(differenceInDays(item.dateFrom, item.dateTo)); i++) {
-            const cell = this.cells[Math.abs(differenceInDays(addDays(parse(item.dateFrom), i), firstDay))];
-            if (i === 0) {
-              cell.push(row, item.title, Math.abs(differenceInDays(item.dateFrom, item.dateTo)) + 1, item.color);
-            } else {
-              cell.push(row, '', 0, '');
-            }
-          }
-        } else if (isEqual(item.dateFrom, item.dateTo)) {
-          let cell = this.cells[Math.abs(differenceInDays(parse(item.dateFrom), firstDay))];
-          cell.push(cell.firstFreeRow, item.title, 1, item.color);
-        }
-      }
-    }
-
+    this._renderEvents();
   }
 
   get date() {
@@ -115,13 +117,13 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
     return format(this.date, 'YYYY MMMM');
   }
 
+  get cells() {
+    return this._cells;
+  }
+
   set date(date: Date) {
     this._date = date;
     this._changeMonth();
-  }
-
-  get cells() {
-    return this._cells;
   }
 
   public nextMonth() {
@@ -130,6 +132,16 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
 
   public prevMonth() {
     this.date = subMonths(this.date, 1);
+  }
+
+  public setEvents(events: Array<Event>){
+    this._events = events;
+    this._generateEvents();
+  }
+
+  public addEvent(event: Event){
+    this._events.push(event);
+    this._generateEvents();
   }
 
 }

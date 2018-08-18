@@ -16,6 +16,25 @@ export class Event {
         this._endDate = endDate || startDate;
         this._color = color || '#ffdd00';
     }
+
+    get id() {
+        return this._id;
+    }
+    get title() {
+        return this._title;
+    }
+    get description() {
+        return this._description;
+    }
+    get startDate() {
+        return this._startDate;
+    }
+    get endDate() {
+        return this._endDate;
+    }
+    get color() {
+        return this._color;
+    }
 }
 
 export class Cell {
@@ -61,7 +80,7 @@ export class Cell {
         let events = [];
         for(const item of Object.keys(this._rows)){
             if(!this._rows[item].free && this._rows[item].title !== ''){
-                let top = Number(item) * 24;
+                let top = Number(item) * 24 + 'px';
                 let width = 'calc(' + this._rows[item].width*100 + '% + ' + (this._rows[item].width - 5) + 'px)';
                 events.push({title:this._rows[item].title, top: top, width: width, color: this._rows[item].color});
             }
