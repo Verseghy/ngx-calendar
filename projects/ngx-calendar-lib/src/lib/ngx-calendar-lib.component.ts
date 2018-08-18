@@ -44,7 +44,7 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
             events.push({id: this._events[item].id, title: this._events[item].title, startDate: eventStartDate, endDate: addDays(this._events[item].startDate, i), color: this._events[item].color})
             eventStartDate = addDays(this._events[item].startDate, i + 1);
           }
-        } 
+        }
         events.push({id: this._events[item].id, title: this._events[item].title, startDate: eventStartDate, endDate: this._events[item].endDate, color: this._events[item].color})
         this._events2.push(...events);
       }else if(isEqual(this._events[item].startDate, this._events[item].endDate)){
@@ -66,7 +66,7 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
         if (isBefore(item.startDate, item.endDate)) {
           let rows = [];
           for (let i = 0; i <= Math.abs(differenceInDays(item.startDate, item.endDate)); i++) {
-            const cell = this._cells[Math.abs(differenceInDays(addDays(parse(item.startDate), 1), firstDay))];
+            const cell = this._cells[Math.abs(differenceInDays(addDays(parse(item.startDate), i), firstDay))];
             rows.push(cell.firstFreeRow);
           }
           let row = Math.max(...rows);
