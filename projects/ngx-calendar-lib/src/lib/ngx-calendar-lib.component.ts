@@ -44,7 +44,7 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
             events.push({id: this._events[item].id, title: this._events[item].title, startDate: eventStartDate, endDate: addDays(this._events[item].startDate, i), color: this._events[item].color})
             eventStartDate = addDays(this._events[item].startDate, i + 1);
           }
-        } 
+        }
         events.push({id: this._events[item].id, title: this._events[item].title, startDate: eventStartDate, endDate: this._events[item].endDate, color: this._events[item].color})
         this._displayedEvents.push(...events);
       }else if(isEqual(this._events[item].startDate, this._events[item].endDate)){
