@@ -1,5 +1,3 @@
-import { ElementRef } from "@angular/core";
-
 export class Event {
   private _id: number;
   private _title: string;
@@ -45,6 +43,10 @@ export interface DisplayedEvent {
   color?: string;
 }
 
+export interface Settings {
+  shortDayNames?: string[];
+}
+
 export class Cell {
   private _rows: {
     id: number;
@@ -85,11 +87,11 @@ export class Cell {
   }
 
   get events() {
-    let events = [];
+    const events = [];
     for (const item of Object.keys(this._rows)) {
       if (!this._rows[item].free && this._rows[item].title !== '') {
-        let top = Number(item) * 24 + 'px';
-        let width = 'calc(' + this._rows[item].width * 100 + '% + ' + (this._rows[item].width - 5) + 'px)';
+        const top = Number(item) * 24 + 'px';
+        const width = 'calc(' + this._rows[item].width * 100 + '% + ' + (this._rows[item].width - 5) + 'px)';
         events.push({ title: this._rows[item].title, top: top, width: width, color: this._rows[item].color });
       }
     }

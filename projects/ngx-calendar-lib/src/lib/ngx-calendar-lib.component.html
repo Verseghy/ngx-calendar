@@ -1,16 +1,13 @@
 <div class="controls">
-  <button class="next" (click)="prevMonth()">&lt;</button>
-  <button class="prev" (click)="nextMonth()">&gt;</button>
-  <span class="month">{{ formatedDate }}</span>
+  <div class="middle">
+    <button class="next" (click)="prevMonth()">&lt;</button>
+    <span class="month">{{ formatedDate }}</span>
+    <button class="prev" (click)="nextMonth()">&gt;</button>
+  </div>
+  <button class="now" (click)="now()">Now</button>
 </div>
 <div class="grid">
-  <div class="cellElement header"><span>H</span></div>
-  <div class="cellElement header"><span>K</span></div>
-  <div class="cellElement header"><span>Sze</span></div>
-  <div class="cellElement header"><span>Cs</span></div>
-  <div class="cellElement header"><span>P</span></div>
-  <div class="cellElement header"><span>Szo</span></div>
-  <div class="cellElement header"><span>V</span></div>
+  <div class="cellElement header" *ngFor="let item of shortDayNames"><span>{{ item }}</span></div>
   <div *ngFor="let cell of cells" class="cellElement" [ngClass]="{'today' : cell.today}">
     <span class="date">{{ cell.day }}</span>
     <div class="events">
