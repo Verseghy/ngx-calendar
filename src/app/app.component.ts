@@ -16,10 +16,15 @@ export class AppComponent implements OnInit {
   @ViewChild(NgxCalendarLibComponent) calendar;
 
   ngOnInit () {
-    const asd = [];
-    asd.push(new Event(0, 'asd1', 'asdasd', new Date(), addDays(new Date(), 0), '#0B8043'));
-    asd.push(new Event(1, 'asd2', 'asdasd', new Date(), addDays(new Date(), 1), '#D50000'));
-    this.calendar.setEvents(asd);
+    const colors = ['#d50000', '#f4511e', '#0b8043', '#039be5', '#3f51b5', '#8e24aa', '#616161'];
+    const array = [];
+    for (let i = 0; i < 20; i++) {
+      const startday = addDays(new Date(), Math.floor(Math.random() * 60) - 30);
+      const endday = addDays(startday,  Math.floor(Math.random() * 3));
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      array.push(new Event(i, 'Event' + i, 'description', startday, endday, color));
+    }
+    this.calendar.setEvents(array);
   }
 
 }

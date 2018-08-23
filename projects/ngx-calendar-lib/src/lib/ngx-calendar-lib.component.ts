@@ -36,6 +36,7 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
       this._ready = true;
       this.shortDayNames = this.settings.shortDayNames;
       this._changeMonth();
+      console.log(this._displayedEvents);
     });
   }
 
@@ -79,7 +80,25 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
         });
       }
     }
+    this._sortDisplayedEvents();
     this._renderEvents();
+  }
+
+  private _sortDisplayedEvents() {
+    let lastDay = this._displayedEvents[0].startDate;
+    let eventsInDay = [];
+    const sortedDisplayedEvents = [];
+    for (const item of this._displayedEvents) {
+      if (isAfter(item.startDate, lastDay)) {
+        lastDay = item.startDate;
+        sortedDisplayedEvents.push(...this._sortEventsInDay(eventsInDay));
+        eventsInDay = [item];
+      } else if (isEqual(item.startDate, lastDay)) {
+        eventsInDay.push(item);
+      }
+    }
+    sortedDisplayedEvents.push(...this._sortEventsInDay(eventsInDay));
+    this._displayedEvents = sortedDisplayedEvents;
   }
 
   private _renderEvents(): void {
@@ -87,7 +106,7 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
     const firstCellDate = this._getFirstCellDate();
     for (const i of Object.keys(this._displayedEvents)) {
       const item = this._displayedEvents[i];
-      if (this._ifEventInMonth(item)) {
+      if (this._isEventInMonth(item)) {
         if (isBefore(item.startDate, item.endDate)) {
           const row = this._getRow(item);
           this._fillCellPlaceholder(item, row);
@@ -104,6 +123,16 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
     const rows = this._getRowsInMonth();
     this._createCells(rows);
     this._renderEvents();
+  }
+
+  private _getRow(item: DisplayedEvent): number {
+    const firstCellDate = this._getFirstCellDate();
+    const rows = [];
+    for (let i = 0; i <= this._eventLenght(item); i++) {
+      const cell = this._cells[Math.abs(differenceInDays(addDays(parse(item.startDate), i), firstCellDate))];
+      rows.push(cell.firstFreeRow);
+    }
+    return Math.max(...rows);
   }
 
   get date() {
@@ -137,12 +166,22 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
 
   public setEvents(events: Array<Event>) {
     this._events = events;
+    this._sortEventsArray();
     this._generateEvents();
   }
 
   public addEvent(event: Event) {
     this._events.push(event);
+    this._sortEventsArray();
     this._generateEvents();
+  }
+
+  private _sortEventsArray(): void {
+    this._events.sort((a, b) => {
+      if (isAfter(a.startDate, b.startDate)) { return 1; }
+      if (isBefore(a.startDate, b.startDate)) { return -1; }
+      return 0;
+    });
   }
 
   private _getFirstCellDate(): Date {
@@ -151,16 +190,6 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
     }
 
     return addDays(startOfWeek(lastDayOfMonth(subMonths(this.date, 1))), 1);
-  }
-
-  private _getRow(item: DisplayedEvent): number {
-    const firstCellDate = this._getFirstCellDate();
-    const rows = [];
-    for (let i = 0; i <= this._eventLenght(item); i++) {
-      const cell = this._cells[Math.abs(differenceInDays(addDays(parse(item.startDate), i), firstCellDate))];
-      rows.push(cell.firstFreeRow);
-    }
-    return Math.max(...rows);
   }
 
   private _fillCellPlaceholder(item: DisplayedEvent, row: number): void {
@@ -175,7 +204,7 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
     }
   }
 
-  private _ifEventInMonth(item: DisplayedEvent): boolean {
+  private _isEventInMonth(item: DisplayedEvent): boolean {
     const firstCellDate = this._getFirstCellDate();
     return isAfter(item.startDate, subDays(firstCellDate, 1)) && isBefore(item.endDate, addDays(endOfWeek(endOfMonth(this.date)), 1));
   }
@@ -226,5 +255,13 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   @Input('settings')
   set settings(settings: Settings) {
     this._settings = settings;
+  }
+
+  private _sortEventsInDay(events: DisplayedEvent[]): DisplayedEvent[] {
+    return events.sort((a, b) => {
+      const aLenght = Math.abs(differenceInDays(a.startDate, a.endDate));
+      const bLenght = Math.abs(differenceInDays(b.startDate, b.endDate));
+      return -(aLenght - bLenght);
+    });
   }
 }

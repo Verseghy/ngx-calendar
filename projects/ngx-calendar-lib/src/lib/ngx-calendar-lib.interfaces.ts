@@ -65,6 +65,15 @@ export class Cell {
     this._date = date;
   }
 
+  public getRow(width: number): number {
+    for (const item of Object.keys(this._rows)) {
+      if (this._rows[item].width <= width) {
+        return Number(item) + 1;
+      }
+    }
+    return this._rows.length + 1;
+  }
+
   get firstFreeRow(): number {
     for (const item of this._rows) {
       if (item.free) {
