@@ -6,11 +6,13 @@ import {
   isBefore, endOfWeek, endOfMonth, getDate, isToday, differenceInDays, parse, format, isEqual, getDaysInMonth, isSaturday
 } from 'date-fns';
 import { Cell } from './cell';
+import { ViewChildren, QueryList, ElementRef } from '@angular/core';
 
 export class Renderer {
   private _date = new Date();
   private _cells: Cell[] = [];
   private _events: DisplayedEvent[] = [];
+  public HostElementRef: ElementRef;
 
   public renderEvents(): void {
     const firstCellDate = this._getFirstCellDate();
@@ -138,7 +140,7 @@ export class Renderer {
   }
 
   private _getMaxVisibleRows(): number {
-    console.log();
+    console.log((this.HostElementRef.nativeElement.offsetHeight - 68) / this._getRowsInMonth());
     return 0;
   }
 }

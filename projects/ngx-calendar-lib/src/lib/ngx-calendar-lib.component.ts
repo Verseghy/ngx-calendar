@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChildren, AfterViewInit, ViewChild, Input } from '@angular/core';
+import { Component, OnInit, ViewChildren, AfterViewInit, ViewChild, Input, QueryList, ElementRef } from '@angular/core';
 import { DisplayedEvent, Settings } from './ngx-calendar-lib.interfaces';
 import { Event } from 'projects/ngx-calendar-lib/src/lib/lib/event';
 import { Cell } from 'projects/ngx-calendar-lib/src/lib/lib/cell';
@@ -29,13 +29,14 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
 
   public shortDayNames: string[];
 
-  constructor() { }
+  constructor(private el: ElementRef) { }
 
   ngOnInit() {
   }
 
   ngAfterViewInit() {
     setTimeout(() => {
+      this._renderer.HostElementRef = this.el;
       this.shortDayNames = this.settings.shortDayNames;
       this._changeMonth();
     });
