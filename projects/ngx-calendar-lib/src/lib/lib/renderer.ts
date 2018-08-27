@@ -1,9 +1,11 @@
 import { DisplayedEvent } from '../ngx-calendar-lib.interfaces';
 import {
   addDays, startOfWeek, lastDayOfMonth,
-  subMonths, startOfMonth, getDay,
-  isSunday, isAfter, subDays,
-  isBefore, endOfWeek, endOfMonth, getDate, isToday, differenceInDays, parse, format, isEqual, getDaysInMonth, isSaturday
+  subMonths, startOfMonth, isSunday,
+  isAfter, subDays, isBefore,
+  endOfWeek, endOfMonth, getDate,
+  isToday, differenceInDays, format,
+  isEqual, getDaysInMonth, isSaturday
 } from 'date-fns';
 import { Cell } from './cell';
 import { ViewChildren, QueryList, ElementRef, HostBinding, HostListener } from '@angular/core';
@@ -81,7 +83,13 @@ export class Renderer {
     const rows = this._getRowsInMonth();
     const firstCellDate = this._getFirstCellDate();
     for (let i = 0; i < 7 * rows; i++) {
-      this._cells.push(new Cell(getDate(addDays(firstCellDate, i)), isToday(addDays(firstCellDate, i)), addDays(firstCellDate, i)));
+      const cell = new Cell(
+        getDate(addDays(firstCellDate, i)),
+        isToday(addDays(firstCellDate, i)),
+        addDays(firstCellDate, i),
+        this._getMaxVisibleRows()
+      );
+      this._cells.push(cell);
     }
     return this._cells;
   }

@@ -9,12 +9,13 @@ export class Cell {
   private _day: number;
   private _date: Date;
   private _today: boolean;
-  private _maxRows = 1;
+  private _maxRows: number;
 
-  constructor(day: number, today: boolean, date: Date) {
+  constructor(day: number, today: boolean, date: Date, maxRows: number) {
     this._day = day;
     this._today = today;
     this._date = date;
+    this._maxRows = maxRows;
   }
 
   public getRow(width: number): number {
