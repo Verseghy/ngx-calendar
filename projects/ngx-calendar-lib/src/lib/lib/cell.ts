@@ -9,6 +9,7 @@ export class Cell {
   private _day: number;
   private _date: Date;
   private _today: boolean;
+  private _maxRows = 1;
 
   constructor(day: number, today: boolean, date: Date) {
     this._day = day;
@@ -58,8 +59,25 @@ export class Cell {
     return events;
   }
 
+  get renderedEvents() {
+    const events = [];
+    for (const item of Object.keys(this._rows)) {
+      if (!this._rows[item].free && this._rows[item].title !== '' && this._rows[item].id < this._maxRows) {
+        const top = Number(item) * 24 + 'px';
+        const width = 'calc(' + this._rows[item].width * 100 + '% + ' + (this._rows[item].width - 5) + 'px)';
+        events.push({ title: this._rows[item].title, top: top, width: width, color: this._rows[item].color });
+      }
+    }
+    return events;
+  }
+
+  set maxRows(rows: number) {
+    this._maxRows = rows;
+  }
+
   public push(row: number, title: string, width: number, color: string) {
     if (this._rows[row]) {
+      this._rows[row].id = row;
       this._rows[row].free = false;
       this._rows[row].title = title;
       this._rows[row].width = width;
@@ -74,10 +92,15 @@ export class Cell {
           color: ''
         });
       }
+      this._rows[row].id = row;
       this._rows[row].free = false;
       this._rows[row].title = title;
       this._rows[row].width = width;
       this._rows[row].color = color;
     }
+  }
+
+  public getLastRow(): number {
+    return this._rows.length;
   }
 }

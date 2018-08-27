@@ -38,6 +38,10 @@ export class AppComponent implements OnInit {
       new Event(1, 'Event2', 'description', new Date(parse('2018-08-07')), new Date(parse('2018-08-08')), '#3f51b5'),
       new Event(2, 'Event3', 'description', new Date(parse('2018-08-09')), new Date(parse('2018-08-09')), '#3f51b5'),
       new Event(3, 'Event4', 'description', new Date(parse('2018-08-09')), new Date(parse('2018-08-10')), '#0b8043'),
+      new Event(4, 'Event5', 'description', new Date(parse('2018-08-09')), new Date(parse('2018-08-09')), '#3f51b5'),
+      new Event(5, 'Event6', 'description', new Date(parse('2018-08-09')), new Date(parse('2018-08-09')), '#3f51b5'),
+      new Event(6, 'Event7', 'description', new Date(parse('2018-08-09')), new Date(parse('2018-08-09')), '#3f51b5'),
+      new Event(7, 'Event8', 'description', new Date(parse('2018-08-09')), new Date(parse('2018-08-09')), '#3f51b5'),
     ];
     this.calendar.setEvents(array2);
   }

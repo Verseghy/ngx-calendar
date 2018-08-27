@@ -6,7 +6,7 @@ import {
   isBefore, endOfWeek, endOfMonth, getDate, isToday, differenceInDays, parse, format, isEqual, getDaysInMonth, isSaturday
 } from 'date-fns';
 import { Cell } from './cell';
-import { ViewChildren, QueryList, ElementRef } from '@angular/core';
+import { ViewChildren, QueryList, ElementRef, HostBinding, HostListener } from '@angular/core';
 
 export class Renderer {
   private _date = new Date();
@@ -64,9 +64,8 @@ export class Renderer {
 
   public changeMonth(date: Date): void {
     this._date = date;
-    this._generateCells(this._getRowsInMonth());
+    this._generateCells();
     this.renderEvents();
-    this._getMaxVisibleRows();
   }
 
   public setEvents(events: DisplayedEvent[]): void {
@@ -77,8 +76,9 @@ export class Renderer {
     return this._cells;
   }
 
-  private _generateCells(rows: number): Cell[] {
+  private _generateCells(): Cell[] {
     this._clearCells();
+    const rows = this._getRowsInMonth();
     const firstCellDate = this._getFirstCellDate();
     for (let i = 0; i < 7 * rows; i++) {
       this._cells.push(new Cell(getDate(addDays(firstCellDate, i)), isToday(addDays(firstCellDate, i)), addDays(firstCellDate, i)));
@@ -112,7 +112,7 @@ export class Renderer {
   private _fillCellPlaceholder(item: DisplayedEvent, row: number): void {
     const firstCellDate = this._getFirstCellDate();
     for (let i = 0; i < this._eventLenght(item); i++) {
-      const cell = this._cells[Math.abs(differenceInDays(addDays(parse(item.startDate), i), firstCellDate))];
+      const cell = this._cells[Math.abs(differenceInDays(addDays(item.startDate, i), firstCellDate))];
       if (i === 0) {
         cell.push(row, item.title, this._eventLenght(item), item.color);
       } else {
@@ -140,7 +140,14 @@ export class Renderer {
   }
 
   private _getMaxVisibleRows(): number {
-    console.log((this.HostElementRef.nativeElement.offsetHeight - 68) / this._getRowsInMonth());
-    return 0;
+    const height = ((this.HostElementRef.nativeElement.offsetHeight - 68) / this._getRowsInMonth() - 32);
+    const maxRows = Math.floor(height / 24);
+    return maxRows;
+  }
+
+  public resize(): void {
+    for (const item of this._cells) {
+      item.maxRows = this._getMaxVisibleRows();
+    }
   }
 }

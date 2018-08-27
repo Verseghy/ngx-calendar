@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChildren, AfterViewInit, ViewChild, Input, QueryList, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChildren, AfterViewInit, ViewChild, Input, QueryList, ElementRef, HostListener } from '@angular/core';
 import { DisplayedEvent, Settings } from './ngx-calendar-lib.interfaces';
 import { Event } from 'projects/ngx-calendar-lib/src/lib/lib/event';
 import { Cell } from 'projects/ngx-calendar-lib/src/lib/lib/cell';
@@ -160,5 +160,10 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
     return events.sort((a, b) => {
       return (this._eventLenght(a) - this._eventLenght(b)) * (-1);
     });
+  }
+
+  @HostListener('window:resize', ['$event'])
+  public resize(): void {
+    this._renderer.resize();
   }
 }
