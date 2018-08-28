@@ -20,7 +20,7 @@ export class Renderer {
     const firstCellDate = this._getFirstCellDate();
     for (const i of Object.keys(this._events)) {
       const item = this._events[i];
-      const asd = [];
+      const eventsInDay = [];
       if (isBefore(item.startDate, item.endDate)) {
 
         let eventStartDate = item.startDate;
@@ -29,7 +29,7 @@ export class Renderer {
             isSunday(addDays(item.startDate, i2)) &&
             (format(addDays(item.startDate, i2), 'YYYY-MM-DD') !==
               format(item.endDate, 'YYYY-MM-DD'))) {
-            asd.push({
+            eventsInDay.push({
               id: item.id,
               title: item.title,
               startDate: eventStartDate,
@@ -39,7 +39,7 @@ export class Renderer {
             eventStartDate = addDays(item.startDate, i2 + 1);
           }
         }
-        asd.push({
+        eventsInDay.push({
           id: item.id,
           title: item.title,
           startDate: eventStartDate,
@@ -47,7 +47,7 @@ export class Renderer {
           color: item.color
         });
       } else if (isEqual(item.startDate, item.endDate)) {
-        asd.push({
+        eventsInDay.push({
           id: item.id,
           title: item.title,
           startDate: item.startDate,
@@ -55,7 +55,7 @@ export class Renderer {
           color: item.color
         });
       }
-      for (const item2 of asd) {
+      for (const item2 of eventsInDay) {
         if (this._isEventInMonth(item2)) {
           const row = this._cells[Math.abs(differenceInDays(item2.startDate, firstCellDate))].firstFreeRow;
           this._fillCellPlaceholder(item2, row);
