@@ -121,11 +121,11 @@ export class Renderer {
     const firstCellDate = this._getFirstCellDate();
     for (let i = 0; i < this._eventLenght(item); i++) {
       const cell = this._cells[Math.abs(differenceInDays(addDays(item.startDate, i), firstCellDate))];
+      let placeholder = true;
       if (i === 0) {
-        cell.push(row, item.title, this._eventLenght(item), item.color);
-      } else {
-        cell.push(row, '', 0, '');
+        placeholder = false;
       }
+      cell.push(item.id, row, item.title, this._eventLenght(item), item.color, placeholder);
     }
   }
 

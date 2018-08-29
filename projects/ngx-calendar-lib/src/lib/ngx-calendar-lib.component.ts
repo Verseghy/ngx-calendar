@@ -166,4 +166,28 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   public resize(): void {
     this._renderer.resize();
   }
+
+  public getEvent(id: number): void {
+    if (id !== null) {
+      for (const item of this._events) {
+        if (item.id === id) {
+          console.log(item);
+        }
+      }
+    }
+  }
+
+  public getMoreEvents(ids: number[]): void {
+    if (ids) {
+      const events = [];
+      for (const item of this._events) {
+        for (const id of ids) {
+          if (item.id === id) {
+            events.push(item);
+          }
+        }
+      }
+      console.log(events);
+    }
+  }
 }

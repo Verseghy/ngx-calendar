@@ -8,6 +8,7 @@ export class Cell {
     title: string;
     width: number;
     color: string;
+    placeholder: boolean;
   }[] = [];
   private _day: number;
   private _date: Date;
@@ -55,8 +56,9 @@ export class Cell {
   }
 
   get renderedEvents() {
+    console.log();
     const events = [];
-    let moreEvents = 0;
+    const moreEvents = [];
     for (const item of Object.keys(this._rows)) {
       let rows = 0;
       if (this._rows[item].length <= this._maxRows) {
@@ -67,21 +69,27 @@ export class Cell {
       rows = this._maxRows - 1;
       if (this._rows[item].row < rows) {
         if (this._rows[item].row < this._maxRows - 1) {
-          if (!this._rows[item].free && this._rows[item].title !== '') {
+          if (!this._rows[item].placeholder) {
             const top = Number(item) * 24 + 'px';
             const width = 'calc(' + this._rows[item].width * 100 + '% + ' + (this._rows[item].width - 5) + 'px)';
-            events.push({ title: this._rows[item].title, top: top, width: width, color: this._rows[item].color });
+            events.push({ id: this._rows[item].id, title: this._rows[item].title, top: top, width: width, color: this._rows[item].color });
           }
         }
-      } else {
+        } else {
         if (!this._rows[item].free) {
-          moreEvents++;
+          moreEvents.push(this._rows[item].id);
         }
       }
     }
-    if (moreEvents !== 0) {
+    if (moreEvents.length > 0) {
       const top2 = (this._maxRows - 1) * 24 + 'px';
-      events.push({ title: moreEvents + ' további', top: top2, width: 'calc(100% - 1px)', color: 'transparent', more: true });
+      events.push({
+        title: moreEvents.length + ' további',
+        top: top2, width: 'calc(100% - 1px)',
+        color: 'transparent',
+        more: true,
+        moreEvents: moreEvents
+      });
     }
     return events;
   }
@@ -90,14 +98,15 @@ export class Cell {
     this._maxRows = rows;
   }
 
-  public push(row: number, title: string, width: number, color: string) {
+  public push(id: number, row: number, title: string, width: number, color: string, placeholder: boolean) {
     if (this._rows[row]) {
-      this._rows[row].id = 0;
+      this._rows[row].id = id;
       this._rows[row].row = row;
       this._rows[row].free = false;
       this._rows[row].title = title;
       this._rows[row].width = width;
       this._rows[row].color = color;
+      this._rows[row].placeholder = placeholder;
     } else {
       for (const _ of Array(row - this._rows.length + 1)) {
         this._rows.push({
@@ -106,15 +115,17 @@ export class Cell {
           free: true,
           title: '',
           width: 0,
-          color: ''
+          color: '',
+          placeholder: true
         });
       }
-      this._rows[row].id = 0;
+      this._rows[row].id = id;
       this._rows[row].row = row;
       this._rows[row].free = false;
       this._rows[row].title = title;
       this._rows[row].width = width;
       this._rows[row].color = color;
+      this._rows[row].placeholder = placeholder;
     }
   }
 

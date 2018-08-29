@@ -46,6 +46,7 @@
 
 .events {
   position: relative;
+  height: calc(100% - 32px);
 }
 
 .event {

@@ -11,7 +11,7 @@
   <div #cellElement *ngFor="let cell of cells" class="cellElement" [ngClass]="{'today' : cell.today}">
     <span class="date">{{ cell.day }}</span>
     <div class="events">
-      <span class="event" *ngFor="let event of cell.renderedEvents" [ngStyle]="{'top': event.top, 'width': event.width, 'background-color': event.color }" [ngClass]="{'more': event.more}">{{ event.title }}</span>
+      <span class="event" *ngFor="let event of cell.renderedEvents" [ngStyle]="{'top': event.top, 'width': event.width, 'background-color': event.color }" [ngClass]="{'more': event.more}" (click)="getEvent(event.id); getMoreEvents(event.moreEvents)">{{ event.title }}</span>
     </div>
   </div>
 </div>
