@@ -8,10 +8,17 @@
 </div>
 <div class="grid">
   <div class="cellElement header" *ngFor="let item of shortDayNames"><span>{{ item }}</span></div>
-  <div #cellElement *ngFor="let cell of cells" class="cellElement" [ngClass]="{'today' : cell.today}">
+  <div #cellElement *ngFor="let cell of cells; trackBy: asd1" class="cellElement" [ngClass]="{'today' : cell.today}">
     <span class="date">{{ cell.day }}</span>
     <div class="events">
-      <span class="event" *ngFor="let event of cell.renderedEvents" [ngStyle]="{'top': event.top, 'width': event.width, 'background-color': event.color }" [ngClass]="{'more': event.more}" (click)="getEvent(event.id); getMoreEvents(event.moreEvents)">{{ event.title }}</span>
+      <div class="event" *ngFor="let event of cell.renderedEvents; trackBy: asd2" [ngStyle]="{'top': event.top, 'width': event.width, 'background-color': event.color }" [ngClass]="{'more': event.more}">
+        <span>{{ event.title }}</span>
+        <ngx-popup [event]="getEvent(event.id)"></ngx-popup>
+      </div>
+      <div class="event more" *ngIf="cell.moreEvents.length" [ngStyle]="{'top': cell.moreEventsTop}">
+        <span>{{ cell.moreEventsCount }} tobábbi</span>
+        <ngx-popup [event]="getEvent(cell.moreEvents)" [moreEvents]="true"></ngx-popup>
+      </div>
     </div>
   </div>
 </div>

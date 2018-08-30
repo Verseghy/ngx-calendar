@@ -128,15 +128,6 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
       return 0;
     });
   }
-
-  private _getFirstCellDate(): Date {
-    if (isSunday(getDay(lastDayOfMonth(subMonths(this.date, 1))))) {
-      return startOfMonth(this.date);
-    }
-
-    return addDays(startOfWeek(lastDayOfMonth(subMonths(this.date, 1))), 1);
-  }
-
   private _clearDisplayedEvents(): void {
     this._displayedEvents = [];
   }
@@ -167,27 +158,32 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
     this._renderer.resize();
   }
 
-  public getEvent(id: number): void {
-    if (id !== null) {
+  public getEvent(id: number | number[]): Event | Event[] {
+    if (typeof id === 'number') {
       for (const item of this._events) {
         if (item.id === id) {
-          console.log(item);
+          return item;
         }
       }
-    }
-  }
-
-  public getMoreEvents(ids: number[]): void {
-    if (ids) {
+    } else {
       const events = [];
       for (const item of this._events) {
-        for (const id of ids) {
-          if (item.id === id) {
+        for (const i of id) {
+          if (item.id === i) {
             events.push(item);
           }
         }
       }
-      console.log(events);
+      return events;
     }
+    return;
+  }
+
+  public asd1(index, item) {
+    return item.id;
+  }
+
+  public asd2(index, item) {
+    return item.id;
   }
 }

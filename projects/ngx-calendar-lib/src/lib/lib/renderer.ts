@@ -84,7 +84,7 @@ export class Renderer {
     const firstCellDate = this._getFirstCellDate();
     for (let i = 0; i < 7 * rows; i++) {
       const cell = new Cell(
-        getDate(addDays(firstCellDate, i)),
+        i,
         isToday(addDays(firstCellDate, i)),
         addDays(firstCellDate, i),
         this._getMaxVisibleRows()

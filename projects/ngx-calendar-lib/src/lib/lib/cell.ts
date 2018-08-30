@@ -1,6 +1,7 @@
 import { format, getDate } from 'date-fns';
 
 export class Cell {
+  private _id: number;
   private _rows: {
     id: number;
     row: number;
@@ -10,13 +11,15 @@ export class Cell {
     color: string;
     placeholder: boolean;
   }[] = [];
-  private _day: number;
   private _date: Date;
   private _today: boolean;
   private _maxRows: number;
+  private _moreEvents: number[] = [];
+  private _moreEventsTop: string;
+  private _moreEventsCount = 0;
 
-  constructor(day: number, today: boolean, date: Date, maxRows: number) {
-    this._day = day;
+  constructor(id: number, today: boolean, date: Date, maxRows: number) {
+    this._id = id;
     this._today = today;
     this._date = date;
     this._maxRows = maxRows;
@@ -55,10 +58,21 @@ export class Cell {
     return this._date;
   }
 
+  get moreEvents(): number[] {
+    return this._moreEvents;
+  }
+
+  get moreEventsTop(): string {
+    return this._moreEventsTop;
+  }
+
+  get moreEventsCount(): number {
+    return this._moreEventsCount;
+  }
+
   get renderedEvents() {
-    console.log();
     const events = [];
-    const moreEvents = [];
+    let moreEvents = 0;
     for (const item of Object.keys(this._rows)) {
       let rows = 0;
       if (this._rows[item].length <= this._maxRows) {
@@ -72,24 +86,31 @@ export class Cell {
           if (!this._rows[item].placeholder) {
             const top = Number(item) * 24 + 'px';
             const width = 'calc(' + this._rows[item].width * 100 + '% + ' + (this._rows[item].width - 5) + 'px)';
-            events.push({ id: this._rows[item].id, title: this._rows[item].title, top: top, width: width, color: this._rows[item].color });
+            events.push({
+              id: this._rows[item].id,
+              title: this._rows[item].title,
+              top: top,
+              width: width,
+              color: this._rows[item].color,
+              more: false
+            });
           }
         }
         } else {
         if (!this._rows[item].free) {
-          moreEvents.push(this._rows[item].id);
+          moreEvents++;
         }
       }
     }
-    if (moreEvents.length > 0) {
-      const top2 = (this._maxRows - 1) * 24 + 'px';
-      events.push({
-        title: moreEvents.length + ' további',
-        top: top2, width: 'calc(100% - 1px)',
-        color: 'transparent',
-        more: true,
-        moreEvents: moreEvents
-      });
+    if (moreEvents) {
+      this._moreEventsTop = (this._maxRows - 1) * 24 + 'px';
+      this._moreEventsCount = moreEvents;
+      this._moreEvents = [];
+      for (const item of this._rows) {
+        if (!item.free) {
+          this._moreEvents.push(item.id);
+        }
+      }
     }
     return events;
   }

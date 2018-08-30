@@ -6,13 +6,20 @@ export class Event {
   private _endDate?: Date;
   private _color?: string;
 
-  constructor(id: number, title: string, description: string, startDate: Date, endDate: Date, color: string) {
+  constructor(
+    id: number,
+    title: string,
+    description: string = '',
+    startDate: Date,
+    endDate: Date = startDate,
+    color: string = '#3f51b5'
+  ) {
     this._id = id;
     this._title = title;
-    this._description = description || '';
+    this._description = description;
     this._startDate = startDate;
-    this._endDate = endDate || startDate;
-    this._color = color || '#ffdd00';
+    this._endDate = endDate;
+    this._color = color;
   }
 
   get id() {
