@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChildren, AfterViewInit, ViewChild, Input, QueryList, ElementRef, HostListener } from '@angular/core';
 import { DisplayedEvent, Settings } from './ngx-calendar-lib.interfaces';
-import { Event } from 'projects/ngx-calendar-lib/src/lib/lib/event';
-import { Cell } from 'projects/ngx-calendar-lib/src/lib/lib/cell';
+import { Event } from './lib/event';
+import { Cell } from './lib/cell';
 import {
   getDay, lastDayOfMonth, startOfWeek,
   addDays, subMonths, startOfMonth,
