@@ -153,7 +153,7 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
     });
   }
 
-  @HostListener('window:resize', ['$event'])
+  @HostListener('window:resize')
   public resize(): void {
     this._renderer.resize();
   }
