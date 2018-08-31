@@ -179,11 +179,11 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
     return;
   }
 
-  public asd1(index, item) {
+  public trackBy1(index, item) {
     return item.id;
   }
 
-  public asd2(index, item) {
+  public trackBy2(index, item) {
     return item.id;
   }
 }
