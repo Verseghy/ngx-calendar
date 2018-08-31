@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChildren, AfterViewInit, ViewChild, Input, QueryList, ElementRef, HostListener } from '@angular/core';
 import { DisplayedEvent, Settings } from './ngx-calendar-lib.interfaces';
-import { Event } from 'projects/ngx-calendar-lib/src/lib/lib/event';
-import { Cell } from 'projects/ngx-calendar-lib/src/lib/lib/cell';
+import { Event } from './lib/event';
+import { Cell } from './lib/cell';
 import {
   getDay, lastDayOfMonth, startOfWeek,
   addDays, subMonths, startOfMonth,
@@ -128,15 +128,6 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
       return 0;
     });
   }
-
-  private _getFirstCellDate(): Date {
-    if (isSunday(getDay(lastDayOfMonth(subMonths(this.date, 1))))) {
-      return startOfMonth(this.date);
-    }
-
-    return addDays(startOfWeek(lastDayOfMonth(subMonths(this.date, 1))), 1);
-  }
-
   private _clearDisplayedEvents(): void {
     this._displayedEvents = [];
   }
@@ -165,5 +156,34 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   @HostListener('window:resize')
   public resize(): void {
     this._renderer.resize();
+  }
+
+  public getEvent(id: number | number[]): Event | Event[] {
+    if (typeof id === 'number') {
+      for (const item of this._events) {
+        if (item.id === id) {
+          return item;
+        }
+      }
+    } else {
+      const events = [];
+      for (const item of this._events) {
+        for (const i of id) {
+          if (item.id === i) {
+            events.push(item);
+          }
+        }
+      }
+      return events;
+    }
+    return;
+  }
+
+  public trackBy1(index, item) {
+    return item.id;
+  }
+
+  public trackBy2(index, item) {
+    return item.id;
   }
 }
