@@ -12,6 +12,7 @@ import {
   endOfWeek, subDays, isSaturday
 } from 'date-fns';
 import { Renderer } from './lib/renderer';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'ngx-calendar',
@@ -28,6 +29,10 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   private _renderer = new Renderer();
 
   public shortDayNames: string[];
+  public monthChange$ = new BehaviorSubject<any>({
+    year: this.date.getFullYear(),
+    month: this.date.getMonth()
+  });
 
   constructor(private el: ElementRef) { }
 
@@ -78,6 +83,10 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   private _changeMonth(): void {
     this._renderer.changeMonth(this._date);
     this._cells = this._renderer.getCells();
+    this.monthChange$.next({
+      year: this.date.getFullYear(),
+      month: this.date.getMonth()
+    });
   }
 
   get date() {
