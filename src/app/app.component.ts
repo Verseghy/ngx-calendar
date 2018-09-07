@@ -44,6 +44,7 @@ export class AppComponent implements OnInit {
       new Event(7, 'Event8', 'description', new Date(parse('2018-08-10')), new Date(parse('2018-08-11')), '#3f51b5'),
     ];
     this.calendar.setEvents(array2);
+    this.calendar.monthChange$.subscribe(x => console.log(x));
   }
 
 }
