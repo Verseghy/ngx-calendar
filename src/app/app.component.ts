@@ -12,11 +12,16 @@ import { Event } from 'projects/ngx-calendar-lib/src/lib/lib/event';
 export class AppComponent implements OnInit {
   title = 'ngx-calendar';
   settings: Settings = {
-    shortDayNames: ['H', 'K', 'Sze', 'Cs', 'P', 'Szo', 'V']
+    shortDayNames: ['H', 'K', 'Sze', 'Cs', 'P', 'Szo', 'V'],
+    monthNames:
+    ['január', 'február', 'március', 'április', 'május', 'június', 'július', 'augusztus', 'szeptember', 'október', 'november', 'december'],
+    shortMonthNames: ['Jan', 'Febr', 'Márc', 'Ápr', 'Máj', 'Jún', 'Júl', 'Aug', 'Szept', 'Okt', 'Nov', 'Dec'],
+    today: 'Ma',
+    moreEvent: '{count} további'
   };
   @ViewChild(NgxCalendarLibComponent) calendar;
 
-  ngOnInit () {
+  ngOnInit() {
     const colors = [
       '#ad1457', '#d81b60', '#d50000', '#e67c73',
       '#f4511e', '#ef6c00', '#f09300', '#f6bf26',
@@ -28,7 +33,7 @@ export class AppComponent implements OnInit {
     const array = [];
     for (let i = 0; i < 70; i++) {
       const startday = addDays(new Date(), Math.floor(Math.random() * 60) - 60);
-      const endday = addDays(startday,  Math.floor(Math.random() * 3));
+      const endday = addDays(startday, Math.floor(Math.random() * 3));
       const color = colors[Math.floor(Math.random() * colors.length)];
       array.push(new Event(i, 'Event' + i, 'description', startday, endday, color));
     }
@@ -43,8 +48,7 @@ export class AppComponent implements OnInit {
       new Event(6, 'Event7', 'description', new Date(parse('2018-08-09')), new Date(parse('2018-08-10')), '#3f51b5'),
       new Event(7, 'Event8', 'description', new Date(parse('2018-08-10')), new Date(parse('2018-08-11')), '#3f51b5'),
     ];
-    this.calendar.setEvents(array2);
-    this.calendar.monthChange$.subscribe(x => console.log(x));
+    this.calendar.setEvents(array);
   }
 
 }

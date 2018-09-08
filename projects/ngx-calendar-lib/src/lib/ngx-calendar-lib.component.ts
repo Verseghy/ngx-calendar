@@ -3,13 +3,20 @@ import { DisplayedEvent, Settings } from './ngx-calendar-lib.interfaces';
 import { Event } from './lib/event';
 import { Cell } from './lib/cell';
 import {
-  getDay, lastDayOfMonth, startOfWeek,
-  addDays, subMonths, startOfMonth,
-  getDate, addMonths, getDaysInMonth,
-  format, isToday, parse,
+  subMonths, addMonths, format,
   isBefore, isAfter, isEqual,
-  differenceInDays, isSunday, endOfMonth,
-  endOfWeek, subDays, isSaturday
+  differenceInDays,
+  getMonth,
+  getDay,
+  isSunday,
+  startOfMonth,
+  getDaysInMonth,
+  isSaturday,
+  addWeeks,
+  startOfWeek,
+  addDays,
+  getDate,
+  getISOWeek
 } from 'date-fns';
 import { Renderer } from './lib/renderer';
 import { BehaviorSubject } from 'rxjs';
@@ -28,21 +35,27 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   private _settings: Settings;
   private _renderer = new Renderer();
 
-  public shortDayNames: string[];
+  public moreEventsPopupVisible = false;
+  public moreEventsPopupTop: number;
+  public moreEventsPopupLeft: number;
+  public moreEventsPopupDay: string;
+  public moreEventsPopupDate: number;
+  public moreEventsPopupEvents;
+
   public monthChange$ = new BehaviorSubject<any>({
     year: this.date.getFullYear(),
     month: this.date.getMonth()
   });
 
-  constructor(private el: ElementRef) { }
+  constructor(private _el: ElementRef) { }
 
   ngOnInit() {
   }
 
   ngAfterViewInit() {
     setTimeout(() => {
-      this._renderer.HostElementRef = this.el;
-      this.shortDayNames = this.settings.shortDayNames;
+      this._renderer.HostElementRef = this._el;
+      this._renderer.settings = this.settings;
       this._changeMonth();
     });
   }
@@ -87,6 +100,7 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
       year: this.date.getFullYear(),
       month: this.date.getMonth()
     });
+    this.moreEventsPopupVisible = false;
   }
 
   get date() {
@@ -94,7 +108,15 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   }
 
   get formatedDate() {
-    return format(this.date, 'YYYY. MMMM');
+    return format(this.date, 'YYYY. ') + this.settings.monthNames[getMonth(this.date)];
+  }
+
+  get shortDayNames() {
+    return this.settings.shortDayNames;
+  }
+
+  get today() {
+    return this.settings.today;
   }
 
   get cells() {
@@ -148,6 +170,12 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   get settings(): Settings {
     this._settings = this._settings || {};
     this._settings.shortDayNames = this._settings.shortDayNames || ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+    this._settings.shortMonthNames = this._settings.shortMonthNames ||
+      ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    this._settings.monthNames = this._settings.monthNames ||
+      ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    this._settings.today = this._settings.today || 'Today';
+    this._settings.moreEvent = this._settings.moreEvent || '{count} more';
     return this._settings;
   }
 
@@ -164,28 +192,20 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
 
   @HostListener('window:resize')
   public resize(): void {
+    this.moreEventsPopupVisible = false;
     this._renderer.resize();
   }
 
-  public getEvent(id: number | number[]): Event | Event[] {
-    if (typeof id === 'number') {
-      for (const item of this._events) {
+  private _getdisplayedEvents(ids: number[]) {
+    const events = [];
+    for (const item of this._events) {
+      for (const id of ids) {
         if (item.id === id) {
-          return item;
+          events.push({id: item.id, title: item.title, color: item.color, });
         }
       }
-    } else {
-      const events = [];
-      for (const item of this._events) {
-        for (const i of id) {
-          if (item.id === i) {
-            events.push(item);
-          }
-        }
-      }
-      return events;
     }
-    return;
+    return events;
   }
 
   public trackBy1(index, item) {
@@ -194,5 +214,34 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
 
   public trackBy2(index, item) {
     return item.id;
+  }
+
+  private _getRowsInMonth(): number {
+    if (
+      (isSunday(startOfMonth(this._date)) && getDaysInMonth(this._date) >= 30) ||
+      (isSaturday(startOfMonth(this._date)) && getDaysInMonth(this._date) === 31)
+    ) {
+      return 6;
+    }
+    return 5;
+  }
+
+  private _getWeekOfMonth(date: Date): number {
+    return getISOWeek(date) - getISOWeek(startOfMonth(date));
+  }
+
+  public setMoreEventsPopup(date: Date, events: number[]): void {
+    const height = ((this._el.nativeElement.offsetHeight - 68) / this._getRowsInMonth());
+    let column = getDay(date);
+    if (column === 0) {
+      column = 7;
+    }
+    const row = this._getWeekOfMonth(date);
+    this.moreEventsPopupVisible = true;
+    this.moreEventsPopupTop = row * height - 50;
+    this.moreEventsPopupLeft = ((column - 1) * (this._el.nativeElement.offsetWidth / 7)) - 24;
+    this.moreEventsPopupDay = this.settings.shortDayNames[column - 1];
+    this.moreEventsPopupDate = getDate(date);
+    this.moreEventsPopupEvents = this._getdisplayedEvents(events);
   }
 }
