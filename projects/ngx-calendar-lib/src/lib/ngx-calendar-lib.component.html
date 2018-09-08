@@ -25,6 +25,7 @@
     <div class="header">
       <span class="day">{{ moreEventsPopupDay }}</span>
       <h2 class="date">{{ moreEventsPopupDate }}</h2>
+      <span class="close" (click)="closeMoreEventsPopup()">x</span>
     </div>
     <div class="events">
       <div class="event" *ngFor="let event of moreEventsPopupEvents" [ngStyle]="{'background-color': event.color }"><span>{{ event.title }}</span></div>

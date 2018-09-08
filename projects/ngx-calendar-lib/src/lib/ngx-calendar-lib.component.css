@@ -112,7 +112,7 @@ button:focus {
 
 .popups {
   position: absolute;
-  top: 69px;
+  top: 0;
   left: 0;
   right: 0;
   bottom: 0;
@@ -162,4 +162,21 @@ button:focus {
   position: static;
   margin: 2px 0;
   background: #3f51b5;
+}
+
+.more-events .close {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  line-height: 38px;
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.more-events .close:hover {
+  background: #ededed;
 }

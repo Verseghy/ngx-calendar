@@ -241,10 +241,14 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
     }
     const row = this._getWeekOfMonth(date);
     this.moreEventsPopupVisible = true;
-    this.moreEventsPopupTop = row * height - 50;
+    this.moreEventsPopupTop = row * height - 50 + 69;
     this.moreEventsPopupLeft = ((column - 1) * (this._el.nativeElement.offsetWidth / 7)) - 24;
     this.moreEventsPopupDay = this.settings.shortDayNames[column - 1];
     this.moreEventsPopupDate = getDate(date);
     this.moreEventsPopupEvents = this._getdisplayedEvents(events);
+  }
+
+  public closeMoreEventsPopup(): void {
+    this.moreEventsPopupVisible = false;
   }
 }
