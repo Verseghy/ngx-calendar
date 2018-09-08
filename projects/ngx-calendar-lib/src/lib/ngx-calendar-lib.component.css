@@ -110,7 +110,7 @@ button:focus {
   position: relative;
 }
 
-.popups {
+.popup {
   position: absolute;
   top: 0;
   left: 0;
@@ -124,7 +124,6 @@ button:focus {
   background: #fff;
   display: inline-block;
   pointer-events: all;
-  margin-left: calc(100% / 7 * 6 - 24px);
   width: calc(100% / 7 + 48px);
   max-height: 300px;
   box-sizing: border-box;
@@ -132,6 +131,7 @@ button:focus {
   z-index: 11;
   position: relative;
   transition: margin .225s;
+  border-radius: 3px;
 }
 
 .more-events .header {
@@ -161,7 +161,6 @@ button:focus {
 .more-events .event {
   position: static;
   margin: 2px 0;
-  background: #3f51b5;
 }
 
 .more-events .close {
@@ -175,8 +174,37 @@ button:focus {
   font-size: 20px;
   cursor: pointer;
   border-radius: 50%;
+  color: rgba(0, 0, 0, 0.54);
 }
 
 .more-events .close:hover {
   background: #ededed;
+}
+
+.eventDetails {
+  box-shadow: 0 24px 38px 3px rgba(0,0,0,0.14), 0 9px 46px 8px rgba(0,0,0,0.12), 0 11px 15px -7px rgba(0,0,0,0.2);
+  background: #fff;
+  display: inline-block;
+  pointer-events: all;
+  max-width: 300px;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 11;
+  position: relative;
+  transition: margin .225s;
+  border-radius: 3px;
+}
+
+.eventDetails .header {
+  background: #3f51b5;
+  height: 36px;
+  padding: 0 12px;
+  line-height: 36px;
+  color: #fff;
+}
+
+.eventDetails h2 {
+  margin: 0;
+  font-weight: 300;
+  font-size: 20px;
 }

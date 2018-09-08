@@ -16,7 +16,8 @@ import {
   startOfWeek,
   addDays,
   getDate,
-  getISOWeek
+  getISOWeek,
+  getYear
 } from 'date-fns';
 import { Renderer } from './lib/renderer';
 import { BehaviorSubject } from 'rxjs';
@@ -42,6 +43,13 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   public moreEventsPopupDate: number;
   public moreEventsPopupEvents;
 
+  public eventDetailsPopupVisible = false;
+  public eventDetailsPopupTop = 20;
+  public eventDetailsPopupLeft = 20;
+  public eventDetailsPopupDate: string;
+  public eventDetailsPopupTitle: string;
+  public eventDetailsPopupDescription: string;
+
   public monthChange$ = new BehaviorSubject<any>({
     year: this.date.getFullYear(),
     month: this.date.getMonth()
@@ -57,6 +65,11 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
       this._renderer.HostElementRef = this._el;
       this._renderer.settings = this.settings;
       this._changeMonth();
+
+
+      const date1 = new Date(2018, 8, 10);
+      const date2 = new Date(2019, 8, 11);
+      console.log(this.formatTwoDays(date1, date2));
     });
   }
 
@@ -201,7 +214,7 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
     for (const item of this._events) {
       for (const event of events) {
         if (item.id === event.id) {
-          displayedEvents.push({id: item.id, title: item.title, color: item.color, order: event.order });
+          displayedEvents.push({ id: item.id, title: item.title, color: item.color, order: event.order });
         }
       }
     }
@@ -250,5 +263,22 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
 
   public closeMoreEventsPopup(): void {
     this.moreEventsPopupVisible = false;
+  }
+
+  public formatTwoDays(date1: Date, date2: Date): string {
+    if (!isEqual(date1, date2)) {
+      let year = '';
+      let month = '';
+      if (getYear(date1) !== getYear(date2)) {
+        year = format(date2, ' YYYY.');
+      }
+      if (getMonth(date1) !== getMonth(date2) || year !== '') {
+        month = ' ' + this.settings.monthNames[getMonth(date2)];
+      }
+      return format(date1, 'YYYY. ') + this.settings.monthNames[getMonth(date1)] + format(date1, ' DD -')
+        + year + month + format(date2, ' DD');
+    } else {
+      return format(date1, 'YYYY. ') + this.settings.monthNames[getMonth(date1)] + format(date1, ' DD');
+    }
   }
 }

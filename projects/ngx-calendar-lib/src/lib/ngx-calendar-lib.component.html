@@ -20,7 +20,7 @@
     </div>
   </div>
 </div>
-<div class="popups">
+<div class="popup">
   <div class="more-events" #moreEventsPopup [ngStyle]="{'margin-top': moreEventsPopupTop + 'px', 'margin-left': moreEventsPopupLeft + 'px'}" *ngIf="moreEventsPopupVisible">
     <div class="header">
       <span class="day">{{ moreEventsPopupDay }}</span>
@@ -32,3 +32,12 @@
     </div>
   </div>
 </div>
+<div class="popup">
+    <div class="eventDetails" [ngStyle]="{'margin-top': eventDetailsPopupTop + 'px', 'margin-left': eventDetailsPopupLeft + 'px'}">
+      <div class="header">
+        <h2 class="title">Title</h2>
+      </div>
+      <span class="date">2018-09-08</span>
+      <p class="description">description</p>
+    </div>
+  </div>
