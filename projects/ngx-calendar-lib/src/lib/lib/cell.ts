@@ -65,7 +65,7 @@ export class Cell {
     const events = [];
     for (const item of this._rows) {
       if (!item.free) {
-        events.push(item.id);
+        events.push({id: item.id, order: item.row});
       }
     }
     return events;

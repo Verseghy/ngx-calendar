@@ -196,16 +196,19 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
     this._renderer.resize();
   }
 
-  private _getdisplayedEvents(ids: number[]) {
-    const events = [];
+  private _getdisplayedEvents(events) {
+    const displayedEvents = [];
     for (const item of this._events) {
-      for (const id of ids) {
-        if (item.id === id) {
-          events.push({id: item.id, title: item.title, color: item.color, });
+      for (const event of events) {
+        if (item.id === event.id) {
+          displayedEvents.push({id: item.id, title: item.title, color: item.color, order: event.order });
         }
       }
     }
-    return events;
+    displayedEvents.sort((a, b) => {
+      return a.order - b.order;
+    });
+    return displayedEvents;
   }
 
   public trackBy1(index, item) {
