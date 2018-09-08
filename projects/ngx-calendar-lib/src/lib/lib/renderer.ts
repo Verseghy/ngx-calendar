@@ -116,7 +116,7 @@ export class Renderer {
     const firstCellDate = this._getFirstCellDate();
     const lastCellDate = this._getLastCellDate();
     return isAfter(format(item.startDate, 'YYYY-MM-DD'), format(subDays(firstCellDate, 1), 'YYYY-MM-DD')) &&
-      isBefore(format(item.endDate, 'YYYY-MM-DD'), format(lastCellDate, 'YYYY-MM-DD'));
+      isBefore(format(item.endDate, 'YYYY-MM-DD'), format(addDays(lastCellDate, 1), 'YYYY-MM-DD'));
   }
 
   private _fillCellPlaceholder(item: DisplayedEvent, row: number): void {

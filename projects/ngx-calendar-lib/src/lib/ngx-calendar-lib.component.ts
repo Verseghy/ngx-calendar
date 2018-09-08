@@ -230,16 +230,16 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   }
 
   private _getWeekOfMonth(date: Date): number {
-    return getISOWeek(date) - getISOWeek(startOfMonth(date));
+    return getISOWeek(date) - getISOWeek(startOfMonth(this.date));
   }
 
   public setMoreEventsPopup(date: Date, events: number[]): void {
     const height = ((this._el.nativeElement.offsetHeight - 68) / this._getRowsInMonth());
+    const row = this._getWeekOfMonth(date);
     let column = getDay(date);
     if (column === 0) {
       column = 7;
     }
-    const row = this._getWeekOfMonth(date);
     this.moreEventsPopupVisible = true;
     this.moreEventsPopupTop = row * height - 50 + 69;
     this.moreEventsPopupLeft = ((column - 1) * (this._el.nativeElement.offsetWidth / 7)) - 24;
