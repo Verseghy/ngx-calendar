@@ -49,6 +49,7 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   public eventDetailsPopupDate: string;
   public eventDetailsPopupTitle: string;
   public eventDetailsPopupDescription: string;
+  public eventDetailsPopupColor: string;
 
   public monthChange$ = new BehaviorSubject<any>({
     year: this.date.getFullYear(),
@@ -65,11 +66,6 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
       this._renderer.HostElementRef = this._el;
       this._renderer.settings = this.settings;
       this._changeMonth();
-
-
-      const date1 = new Date(2018, 8, 10);
-      const date2 = new Date(2019, 8, 11);
-      console.log(this.formatTwoDays(date1, date2));
     });
   }
 
@@ -113,7 +109,8 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
       year: this.date.getFullYear(),
       month: this.date.getMonth()
     });
-    this.moreEventsPopupVisible = false;
+    this.closeMoreEventsPopup();
+    this.closeEventDetailsPopup();
   }
 
   get date() {
@@ -205,11 +202,12 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
 
   @HostListener('window:resize')
   public resize(): void {
-    this.moreEventsPopupVisible = false;
+    this.closeMoreEventsPopup();
+    this.closeEventDetailsPopup();
     this._renderer.resize();
   }
 
-  private _getdisplayedEvents(events) {
+  private _getDisplayedEvents(events) {
     const displayedEvents = [];
     for (const item of this._events) {
       for (const event of events) {
@@ -222,6 +220,15 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
       return a.order - b.order;
     });
     return displayedEvents;
+  }
+
+  private _getEvent(id: number): Event {
+    for (const item of this._events) {
+        if (item.id === id) {
+          return item;
+        }
+    }
+    return;
   }
 
   public trackBy1(index, item) {
@@ -258,14 +265,14 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
     this.moreEventsPopupLeft = ((column - 1) * (this._el.nativeElement.offsetWidth / 7)) - 24;
     this.moreEventsPopupDay = this.settings.shortDayNames[column - 1];
     this.moreEventsPopupDate = getDate(date);
-    this.moreEventsPopupEvents = this._getdisplayedEvents(events);
+    this.moreEventsPopupEvents = this._getDisplayedEvents(events);
   }
 
   public closeMoreEventsPopup(): void {
     this.moreEventsPopupVisible = false;
   }
 
-  public formatTwoDays(date1: Date, date2: Date): string {
+  private _formatTwoDays(date1: Date, date2: Date): string {
     if (!isEqual(date1, date2)) {
       let year = '';
       let month = '';
@@ -275,10 +282,23 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
       if (getMonth(date1) !== getMonth(date2) || year !== '') {
         month = ' ' + this.settings.monthNames[getMonth(date2)];
       }
-      return format(date1, 'YYYY. ') + this.settings.monthNames[getMonth(date1)] + format(date1, ' DD -')
-        + year + month + format(date2, ' DD');
+      return format(date1, 'YYYY. ') + this.settings.monthNames[getMonth(date1)] + format(date1, ' D -')
+        + year + month + format(date2, ' D');
     } else {
-      return format(date1, 'YYYY. ') + this.settings.monthNames[getMonth(date1)] + format(date1, ' DD');
+      return format(date1, 'YYYY. ') + this.settings.monthNames[getMonth(date1)] + format(date1, ' D');
     }
+  }
+
+  public setEventDetailsPopup(id: number): void {
+    const event = this._getEvent(id);
+    this.eventDetailsPopupVisible = true;
+    this.eventDetailsPopupTitle = event.title;
+    this.eventDetailsPopupDate = this._formatTwoDays(event.startDate, event.endDate);
+    this.eventDetailsPopupDescription = event.description;
+    this.eventDetailsPopupColor = event.color;
+  }
+
+  public closeEventDetailsPopup(): void {
+    this.eventDetailsPopupVisible = false;
   }
 }

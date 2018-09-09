@@ -205,6 +205,39 @@ button:focus {
 
 .eventDetails h2 {
   margin: 0;
-  font-weight: 300;
+  font-weight: 400;
+  font-size: 16px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  padding-right: 36px;
+}
+
+.eventDetails .close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  text-align: center;
+  line-height: 32px;
   font-size: 20px;
+  cursor: pointer;
+  border-radius: 50%;
+  color: #fff;
+}
+
+.eventDetails .close:hover {
+  background: rgba(255,255,255,0.122);
+}
+
+.eventDetails .description {
+  margin: 0;
+  padding: 12px;
+}
+
+.eventDetails .date {
+  padding: 12px;
+  padding-bottom: 0;
+  display: block;
+  font-size: 14px;
 }

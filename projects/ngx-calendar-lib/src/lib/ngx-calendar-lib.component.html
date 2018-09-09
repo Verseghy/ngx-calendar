@@ -11,7 +11,7 @@
   <div #cellElement *ngFor="let cell of cells; trackBy: trackBy1" class="cellElement" [ngClass]="{'today' : cell.today}">
     <span class="date">{{ cell.day }}</span>
     <div class="events">
-      <div class="event" *ngFor="let event of cell.renderedEvents; trackBy: trackBy2" [ngStyle]="{'top': event.top, 'width': event.width, 'background-color': event.color }" [ngClass]="{'more': event.more}">
+      <div class="event" *ngFor="let event of cell.renderedEvents; trackBy: trackBy2" [ngStyle]="{'top': event.top, 'width': event.width, 'background-color': event.color }" [ngClass]="{'more': event.more}" (click)="setEventDetailsPopup(event.id)">
         <span>{{ event.title }}</span>
       </div>
       <div class="event more" *ngIf="cell.moreEventsVisible" [ngStyle]="{'top': cell.moreEventsTop}" (click)="setMoreEventsPopup(cell.date, cell.getEvents)">
@@ -28,16 +28,17 @@
       <span class="close" (click)="closeMoreEventsPopup()">x</span>
     </div>
     <div class="events">
-      <div class="event" *ngFor="let event of moreEventsPopupEvents" [ngStyle]="{'background-color': event.color }"><span>{{ event.title }}</span></div>
+      <div class="event" *ngFor="let event of moreEventsPopupEvents" [ngStyle]="{'background-color': event.color }" (click)="setEventDetailsPopup(event.id)"><span>{{ event.title }}</span></div>
     </div>
   </div>
 </div>
 <div class="popup">
-    <div class="eventDetails" [ngStyle]="{'margin-top': eventDetailsPopupTop + 'px', 'margin-left': eventDetailsPopupLeft + 'px'}">
-      <div class="header">
-        <h2 class="title">Title</h2>
+    <div class="eventDetails" [ngStyle]="{'margin-top': eventDetailsPopupTop + 'px', 'margin-left': eventDetailsPopupLeft + 'px'}" *ngIf="eventDetailsPopupVisible">
+      <div class="header" [ngStyle]="{'background-color': eventDetailsPopupColor}">
+        <h2 class="title">{{ eventDetailsPopupTitle }}</h2>
+        <span class="close" (click)="closeEventDetailsPopup()">x</span>
       </div>
-      <span class="date">2018-09-08</span>
-      <p class="description">description</p>
+      <span class="date">{{ eventDetailsPopupDate }}</span>
+      <p class="description">{{ eventDetailsPopupDescription }}</p>
     </div>
   </div>
