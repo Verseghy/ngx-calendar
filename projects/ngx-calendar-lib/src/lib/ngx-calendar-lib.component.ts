@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChildren, AfterViewInit, ViewChild, Input, QueryList, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, Input, ElementRef, HostListener } from '@angular/core';
 import { DisplayedEvent, Settings } from './ngx-calendar-lib.interfaces';
 import { Event } from './lib/event';
 import { Cell } from './lib/cell';
@@ -12,9 +12,6 @@ import {
   startOfMonth,
   getDaysInMonth,
   isSaturday,
-  addWeeks,
-  startOfWeek,
-  addDays,
   getDate,
   getISOWeek,
   getYear
@@ -42,6 +39,7 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   public moreEventsPopupDay: string;
   public moreEventsPopupDate: number;
   public moreEventsPopupEvents;
+  @ViewChild('moreEvents') moreEventsPopupElement: ElementRef;
 
   public eventDetailsPopupVisible = false;
   public eventDetailsPopupTop = 0;
@@ -50,6 +48,7 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   public eventDetailsPopupTitle: string;
   public eventDetailsPopupDescription: string;
   public eventDetailsPopupColor: string;
+  @ViewChild('eventDetails') eventDetailsPopupElement: ElementRef;
 
   public monthChange$ = new BehaviorSubject<any>({
     year: this.date.getFullYear(),
@@ -224,9 +223,9 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
 
   private _getEvent(id: number): Event {
     for (const item of this._events) {
-        if (item.id === id) {
-          return item;
-        }
+      if (item.id === id) {
+        return item;
+      }
     }
     return;
   }
@@ -254,18 +253,20 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   }
 
   public setMoreEventsPopup(date: Date, events: number[]): void {
-    const height = ((this._el.nativeElement.offsetHeight - 68) / this._getRowsInMonth());
-    const row = this._getWeekOfMonth(date);
-    let column = getDay(date);
-    if (column === 0) {
-      column = 7;
-    }
-    this.moreEventsPopupVisible = true;
-    this.moreEventsPopupTop = row * height - 50 + 69;
-    this.moreEventsPopupLeft = ((column - 1) * (this._el.nativeElement.offsetWidth / 7)) - 24;
-    this.moreEventsPopupDay = this.settings.shortDayNames[column - 1];
-    this.moreEventsPopupDate = getDate(date);
-    this.moreEventsPopupEvents = this._getDisplayedEvents(events);
+    setTimeout(() => {
+      const height = ((this._el.nativeElement.offsetHeight - 68) / this._getRowsInMonth());
+      const row = this._getWeekOfMonth(date);
+      let column = getDay(date);
+      if (column === 0) {
+        column = 7;
+      }
+      this.moreEventsPopupVisible = true;
+      this.moreEventsPopupTop = row * height - 50 + 69;
+      this.moreEventsPopupLeft = ((column - 1) * (this._el.nativeElement.offsetWidth / 7)) - 24;
+      this.moreEventsPopupDay = this.settings.shortDayNames[column - 1];
+      this.moreEventsPopupDate = getDate(date);
+      this.moreEventsPopupEvents = this._getDisplayedEvents(events);
+    });
   }
 
   public closeMoreEventsPopup(): void {
@@ -290,26 +291,72 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   }
 
   public setEventDetailsPopup(id: number, click): void {
-    const event = this._getEvent(id);
-    const boundingRect = click.target.getBoundingClientRect();
-    this.eventDetailsPopupVisible = true;
-    this.eventDetailsPopupTitle = event.title;
-    this.eventDetailsPopupDate = this._formatTwoDays(event.startDate, event.endDate);
-    this.eventDetailsPopupDescription = event.description;
-    this.eventDetailsPopupColor = event.color;
-    this.eventDetailsPopupTop = boundingRect.y;
-    if (document.body.clientWidth - boundingRect.right < 320) {
-      if (boundingRect.x < 320) {
-        this.eventDetailsPopupLeft = document.body.clientWidth / 2 - 150;
+    setTimeout(() => {
+      const event = this._getEvent(id);
+      const boundingRect = click.target.getBoundingClientRect();
+      const calendarBoundingRect = this._el.nativeElement.getBoundingClientRect();
+      this.eventDetailsPopupVisible = true;
+      this.eventDetailsPopupTitle = event.title;
+      this.eventDetailsPopupDate = this._formatTwoDays(event.startDate, event.endDate);
+      this.eventDetailsPopupDescription = event.description;
+      this.eventDetailsPopupColor = event.color;
+      this.eventDetailsPopupTop = boundingRect.y - calendarBoundingRect.y;
+      if (document.body.clientWidth - boundingRect.right < 320) {
+        if (boundingRect.x < 320) {
+          this.eventDetailsPopupLeft = calendarBoundingRect.clientWidth / 2 - 150;
+        } else {
+          this.eventDetailsPopupLeft = boundingRect.x - 310 - calendarBoundingRect.x;
+        }
       } else {
-        this.eventDetailsPopupLeft = boundingRect.x - 310;
+        this.eventDetailsPopupLeft = boundingRect.right + 10 - calendarBoundingRect.x;
       }
-    } else {
-      this.eventDetailsPopupLeft = boundingRect.right + 10;
-    }
+    });
   }
 
   public closeEventDetailsPopup(): void {
     this.eventDetailsPopupVisible = false;
+  }
+
+  @HostListener('document:click', ['$event']) clickout(event) {
+    let eventDetails = false;
+    let moreEvents = false;
+    for (let i = 0; i < event.path.length; i++) {
+      const element = event.path[i];
+      if (this.eventDetailsPopupVisible && element === this.eventDetailsPopupElement.nativeElement) {
+        if (this.moreEventsPopupVisible) {
+          moreEvents = true;
+        }
+        eventDetails = true;
+      }
+      if (this.moreEventsPopupVisible && element === this.moreEventsPopupElement.nativeElement) {
+        moreEvents = true;
+      }
+
+      if (element.parentElement) {
+        if (element.parentElement.classList.contains('event')
+        && !element.parentElement.classList.contains('more')
+        && !element.parentElement.classList.contains('popup-event')) {
+          eventDetails = true;
+          moreEvents = false;
+        }
+        if (element.parentElement.classList.contains('event')
+        && element.parentElement.classList.contains('more')) {
+          eventDetails = false;
+          moreEvents = true;
+        }
+        if (element.parentElement.classList.contains('event')
+        && !element.parentElement.classList.contains('more')
+        && element.parentElement.classList.contains('popup-event')) {
+          eventDetails = true;
+          moreEvents = true;
+        }
+      }
+    }
+    if (!eventDetails) {
+      this.eventDetailsPopupVisible = false;
+    }
+    if (!moreEvents) {
+      this.moreEventsPopupVisible = false;
+    }
   }
 }

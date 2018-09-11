@@ -21,19 +21,19 @@
   </div>
 </div>
 <div class="popup">
-  <div class="more-events" #moreEventsPopup [ngStyle]="{'margin-top': moreEventsPopupTop + 'px', 'margin-left': moreEventsPopupLeft + 'px'}" *ngIf="moreEventsPopupVisible">
+  <div class="more-events" #moreEventsPopup [ngStyle]="{'margin-top': moreEventsPopupTop + 'px', 'margin-left': moreEventsPopupLeft + 'px'}" *ngIf="moreEventsPopupVisible" #moreEvents>
     <div class="header">
       <span class="day">{{ moreEventsPopupDay }}</span>
       <h2 class="date">{{ moreEventsPopupDate }}</h2>
       <span class="close" (click)="closeMoreEventsPopup()">x</span>
     </div>
     <div class="events">
-      <div class="event" *ngFor="let event of moreEventsPopupEvents" [ngStyle]="{'background-color': event.color }" (click)="setEventDetailsPopup(event.id, $event)"><span>{{ event.title }}</span></div>
+      <div class="event popup-event" *ngFor="let event of moreEventsPopupEvents" [ngStyle]="{'background-color': event.color }" (click)="setEventDetailsPopup(event.id, $event)"><span>{{ event.title }}</span></div>
     </div>
   </div>
 </div>
 <div class="popup">
-    <div class="eventDetails" [ngStyle]="{'margin-top': eventDetailsPopupTop + 'px', 'margin-left': eventDetailsPopupLeft + 'px'}" *ngIf="eventDetailsPopupVisible">
+    <div class="eventDetails" [ngStyle]="{'margin-top': eventDetailsPopupTop + 'px', 'margin-left': eventDetailsPopupLeft + 'px'}" *ngIf="eventDetailsPopupVisible" #eventDetails>
       <div class="header" [ngStyle]="{'background-color': eventDetailsPopupColor}">
         <h2 class="title">{{ eventDetailsPopupTitle }}</h2>
         <span class="close" (click)="closeEventDetailsPopup()">x</span>
