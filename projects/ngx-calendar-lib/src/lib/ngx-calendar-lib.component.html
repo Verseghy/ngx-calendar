@@ -11,7 +11,7 @@
   <div #cellElement *ngFor="let cell of cells; trackBy: trackBy1" class="cellElement" [ngClass]="{'today' : cell.today}">
     <span class="date">{{ cell.day }}</span>
     <div class="events">
-      <div class="event" *ngFor="let event of cell.renderedEvents; trackBy: trackBy2" [ngStyle]="{'top': event.top, 'width': event.width, 'background-color': event.color }" [ngClass]="{'more': event.more}" (click)="setEventDetailsPopup(event.id)">
+      <div class="event" *ngFor="let event of cell.renderedEvents; trackBy: trackBy2" [ngStyle]="{'top': event.top, 'width': event.width, 'background-color': event.color }" [ngClass]="{'more': event.more}" (click)="setEventDetailsPopup(event.id, $event)">
         <span>{{ event.title }}</span>
       </div>
       <div class="event more" *ngIf="cell.moreEventsVisible" [ngStyle]="{'top': cell.moreEventsTop}" (click)="setMoreEventsPopup(cell.date, cell.getEvents)">
@@ -28,7 +28,7 @@
       <span class="close" (click)="closeMoreEventsPopup()">x</span>
     </div>
     <div class="events">
-      <div class="event" *ngFor="let event of moreEventsPopupEvents" [ngStyle]="{'background-color': event.color }" (click)="setEventDetailsPopup(event.id)"><span>{{ event.title }}</span></div>
+      <div class="event" *ngFor="let event of moreEventsPopupEvents" [ngStyle]="{'background-color': event.color }" (click)="setEventDetailsPopup(event.id, $event)"><span>{{ event.title }}</span></div>
     </div>
   </div>
 </div>

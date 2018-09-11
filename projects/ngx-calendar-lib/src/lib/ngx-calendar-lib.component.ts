@@ -44,8 +44,8 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   public moreEventsPopupEvents;
 
   public eventDetailsPopupVisible = false;
-  public eventDetailsPopupTop = 20;
-  public eventDetailsPopupLeft = 20;
+  public eventDetailsPopupTop = 0;
+  public eventDetailsPopupLeft = 0;
   public eventDetailsPopupDate: string;
   public eventDetailsPopupTitle: string;
   public eventDetailsPopupDescription: string;
@@ -289,13 +289,24 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
     }
   }
 
-  public setEventDetailsPopup(id: number): void {
+  public setEventDetailsPopup(id: number, click): void {
     const event = this._getEvent(id);
+    const boundingRect = click.target.getBoundingClientRect();
     this.eventDetailsPopupVisible = true;
     this.eventDetailsPopupTitle = event.title;
     this.eventDetailsPopupDate = this._formatTwoDays(event.startDate, event.endDate);
     this.eventDetailsPopupDescription = event.description;
     this.eventDetailsPopupColor = event.color;
+    this.eventDetailsPopupTop = boundingRect.y;
+    if (document.body.clientWidth - boundingRect.right < 320) {
+      if (boundingRect.x < 320) {
+        this.eventDetailsPopupLeft = document.body.clientWidth / 2 - 150;
+      } else {
+        this.eventDetailsPopupLeft = boundingRect.x - 310;
+      }
+    } else {
+      this.eventDetailsPopupLeft = boundingRect.right + 10;
+    }
   }
 
   public closeEventDetailsPopup(): void {
