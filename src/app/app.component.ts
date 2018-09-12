@@ -13,8 +13,8 @@ export class AppComponent implements OnInit {
   title = 'ngx-calendar';
   settings: Settings = {
     shortDayNames: ['H', 'K', 'Sze', 'Cs', 'P', 'Szo', 'V'],
-    monthNames:
-    ['január', 'február', 'március', 'április', 'május', 'június', 'július', 'augusztus', 'szeptember', 'október', 'november', 'december'],
+    monthNames: ['január', 'február', 'március', 'április', 'május', 'június',
+      'július', 'augusztus', 'szeptember', 'október', 'november', 'december'],
     shortMonthNames: ['Jan', 'Febr', 'Márc', 'Ápr', 'Máj', 'Jún', 'Júl', 'Aug', 'Szept', 'Okt', 'Nov', 'Dec'],
     today: 'Ma',
     moreEvent: '{count} további'
@@ -39,14 +39,7 @@ export class AppComponent implements OnInit {
     }
 
     const array2 = [
-      new Event(0, 'Event1', 'description', new Date(parse('2018-08-08')), new Date(parse('2018-08-10')), '#3f51b5'),
-      new Event(1, 'Event2', 'description', new Date(parse('2018-08-07')), new Date(parse('2018-08-08')), '#3f51b5'),
-      new Event(2, 'Event3', 'description', new Date(parse('2018-08-09')), new Date(parse('2018-08-10')), '#3f51b5'),
-      new Event(3, 'Event4', 'description', new Date(parse('2018-08-09')), new Date(parse('2018-08-10')), '#0b8043'),
-      new Event(4, 'Event5', 'description', new Date(parse('2018-08-09')), new Date(parse('2018-08-10')), '#3f51b5'),
-      new Event(5, 'Event6', 'description', new Date(parse('2018-08-09')), new Date(parse('2018-08-10')), '#3f51b5'),
-      new Event(6, 'Event7', 'description', new Date(parse('2018-08-09')), new Date(parse('2018-08-10')), '#3f51b5'),
-      new Event(7, 'Event8', 'description', new Date(parse('2018-08-10')), new Date(parse('2018-08-11')), '#3f51b5'),
+      new Event(0, 'Event1', 'description', new Date(parse('2018-09-05')), new Date(parse('2018-09-07')), '#3f51b5')
     ];
     this.calendar.setEvents(array);
   }

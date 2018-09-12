@@ -303,7 +303,7 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
       this.eventDetailsPopupTop = boundingRect.y - calendarBoundingRect.y;
       if (document.body.clientWidth - boundingRect.right < 320) {
         if (boundingRect.x < 320) {
-          this.eventDetailsPopupLeft = calendarBoundingRect.clientWidth / 2 - 150;
+          this.eventDetailsPopupLeft = calendarBoundingRect.width / 2 - 150;
         } else {
           this.eventDetailsPopupLeft = boundingRect.x - 310 - calendarBoundingRect.x;
         }
@@ -314,7 +314,9 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   }
 
   public closeEventDetailsPopup(): void {
-    this.eventDetailsPopupVisible = false;
+    setTimeout(() => {
+      this.eventDetailsPopupVisible = false;
+    });
   }
 
   @HostListener('document:click', ['$event']) clickout(event) {
@@ -334,19 +336,19 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
 
       if (element.parentElement) {
         if (element.parentElement.classList.contains('event')
-        && !element.parentElement.classList.contains('more')
-        && !element.parentElement.classList.contains('popup-event')) {
+          && !element.parentElement.classList.contains('more')
+          && !element.parentElement.classList.contains('popup-event')) {
           eventDetails = true;
           moreEvents = false;
         }
         if (element.parentElement.classList.contains('event')
-        && element.parentElement.classList.contains('more')) {
+          && element.parentElement.classList.contains('more')) {
           eventDetails = false;
           moreEvents = true;
         }
         if (element.parentElement.classList.contains('event')
-        && !element.parentElement.classList.contains('more')
-        && element.parentElement.classList.contains('popup-event')) {
+          && !element.parentElement.classList.contains('more')
+          && element.parentElement.classList.contains('popup-event')) {
           eventDetails = true;
           moreEvents = true;
         }

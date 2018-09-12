@@ -57,6 +57,7 @@
   display: block;
   box-sizing: border-box;
   z-index: 10;
+  cursor: pointer;
 }
 
 .event span {
