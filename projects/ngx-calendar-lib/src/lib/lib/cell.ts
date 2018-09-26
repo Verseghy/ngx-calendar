@@ -1,4 +1,5 @@
-import { format, getDate } from 'date-fns';
+import { format, getDate, getMonth } from 'date-fns';
+import { Settings } from '../ngx-calendar-lib.interfaces';
 
 export class Cell {
   private _id: number;
@@ -14,15 +15,17 @@ export class Cell {
   private _date: Date;
   private _today: boolean;
   private _maxRows: number;
-  private _moreEvents: number[] = [];
   private _moreEventsTop: string;
   private _moreEventsCount = 0;
+  private _settings: Settings;
+  private _moreEventsVisible: boolean;
 
-  constructor(id: number, today: boolean, date: Date, maxRows: number) {
+  constructor(id: number, today: boolean, date: Date, maxRows: number, settings: Settings) {
     this._id = id;
     this._today = today;
     this._date = date;
     this._maxRows = maxRows;
+    this._settings = settings;
   }
 
   public getRow(width: number): number {
@@ -45,7 +48,7 @@ export class Cell {
 
   get day(): string {
     if (getDate(this._date) === 1) {
-      return format(this._date, 'MMM. D');
+      return this._settings.shortMonthNames[getMonth(this._date)] + format(this._date, '. D');
     }
     return format(this._date, 'D');
   }
@@ -58,16 +61,27 @@ export class Cell {
     return this._date;
   }
 
-  get moreEvents(): number[] {
-    return this._moreEvents;
+  get getEvents(): number[] {
+    const events = [];
+    for (const item of this._rows) {
+      if (!item.free) {
+        events.push({id: item.id, order: item.row});
+      }
+    }
+    return events;
+  }
+
+  get moreEventsVisible(): boolean {
+    return this._moreEventsVisible;
   }
 
   get moreEventsTop(): string {
     return this._moreEventsTop;
   }
 
-  get moreEventsCount(): number {
-    return this._moreEventsCount;
+  get moreEventsText(): string {
+    const text = this._settings.moreEvent;
+    return text.replace('{count}', String(this._moreEventsCount));
   }
 
   get renderedEvents() {
@@ -103,14 +117,9 @@ export class Cell {
       }
     }
     if (moreEvents) {
+      this._moreEventsVisible = true;
       this._moreEventsTop = (this._maxRows - 1) * 24 + 'px';
       this._moreEventsCount = moreEvents;
-      this._moreEvents = [];
-      for (const item of this._rows) {
-        if (!item.free) {
-          this._moreEvents.push(item.id);
-        }
-      }
     }
     return events;
   }

@@ -1,15 +1,20 @@
-import { Component, OnInit, ViewChildren, AfterViewInit, ViewChild, Input, QueryList, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, Input, ElementRef, HostListener } from '@angular/core';
 import { DisplayedEvent, Settings } from './ngx-calendar-lib.interfaces';
 import { Event } from './lib/event';
 import { Cell } from './lib/cell';
 import {
-  getDay, lastDayOfMonth, startOfWeek,
-  addDays, subMonths, startOfMonth,
-  getDate, addMonths, getDaysInMonth,
-  format, isToday, parse,
+  subMonths, addMonths, format,
   isBefore, isAfter, isEqual,
-  differenceInDays, isSunday, endOfMonth,
-  endOfWeek, subDays, isSaturday
+  differenceInDays,
+  getMonth,
+  getDay,
+  isSunday,
+  startOfMonth,
+  getDaysInMonth,
+  isSaturday,
+  getDate,
+  getISOWeek,
+  getYear
 } from 'date-fns';
 import { Renderer } from './lib/renderer';
 import { BehaviorSubject } from 'rxjs';
@@ -28,21 +33,37 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   private _settings: Settings;
   private _renderer = new Renderer();
 
-  public shortDayNames: string[];
+  public moreEventsPopupVisible = false;
+  public moreEventsPopupTop: number;
+  public moreEventsPopupLeft: number;
+  public moreEventsPopupDay: string;
+  public moreEventsPopupDate: number;
+  public moreEventsPopupEvents;
+  @ViewChild('moreEvents') moreEventsPopupElement: ElementRef;
+
+  public eventDetailsPopupVisible = false;
+  public eventDetailsPopupTop = 0;
+  public eventDetailsPopupLeft = 0;
+  public eventDetailsPopupDate: string;
+  public eventDetailsPopupTitle: string;
+  public eventDetailsPopupDescription: string;
+  public eventDetailsPopupColor: string;
+  @ViewChild('eventDetails') eventDetailsPopupElement: ElementRef;
+
   public monthChange$ = new BehaviorSubject<any>({
     year: this.date.getFullYear(),
     month: this.date.getMonth()
   });
 
-  constructor(private el: ElementRef) { }
+  constructor(private _el: ElementRef) { }
 
   ngOnInit() {
   }
 
   ngAfterViewInit() {
     setTimeout(() => {
-      this._renderer.HostElementRef = this.el;
-      this.shortDayNames = this.settings.shortDayNames;
+      this._renderer.HostElementRef = this._el;
+      this._renderer.settings = this.settings;
       this._changeMonth();
     });
   }
@@ -87,6 +108,8 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
       year: this.date.getFullYear(),
       month: this.date.getMonth()
     });
+    this.closeMoreEventsPopup();
+    this.closeEventDetailsPopup();
   }
 
   get date() {
@@ -94,7 +117,15 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   }
 
   get formatedDate() {
-    return format(this.date, 'YYYY. MMMM');
+    return format(this.date, 'YYYY. ') + this.settings.monthNames[getMonth(this.date)];
+  }
+
+  get shortDayNames() {
+    return this.settings.shortDayNames;
+  }
+
+  get today() {
+    return this.settings.today;
   }
 
   get cells() {
@@ -148,6 +179,12 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
   get settings(): Settings {
     this._settings = this._settings || {};
     this._settings.shortDayNames = this._settings.shortDayNames || ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+    this._settings.shortMonthNames = this._settings.shortMonthNames ||
+      ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    this._settings.monthNames = this._settings.monthNames ||
+      ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    this._settings.today = this._settings.today || 'Today';
+    this._settings.moreEvent = this._settings.moreEvent || '{count} more';
     return this._settings;
   }
 
@@ -164,26 +201,31 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
 
   @HostListener('window:resize')
   public resize(): void {
+    this.closeMoreEventsPopup();
+    this.closeEventDetailsPopup();
     this._renderer.resize();
   }
 
-  public getEvent(id: number | number[]): Event | Event[] {
-    if (typeof id === 'number') {
-      for (const item of this._events) {
-        if (item.id === id) {
-          return item;
+  private _getDisplayedEvents(events) {
+    const displayedEvents = [];
+    for (const item of this._events) {
+      for (const event of events) {
+        if (item.id === event.id) {
+          displayedEvents.push({ id: item.id, title: item.title, color: item.color, order: event.order });
         }
       }
-    } else {
-      const events = [];
-      for (const item of this._events) {
-        for (const i of id) {
-          if (item.id === i) {
-            events.push(item);
-          }
-        }
+    }
+    displayedEvents.sort((a, b) => {
+      return a.order - b.order;
+    });
+    return displayedEvents;
+  }
+
+  private _getEvent(id: number): Event {
+    for (const item of this._events) {
+      if (item.id === id) {
+        return item;
       }
-      return events;
     }
     return;
   }
@@ -194,5 +236,129 @@ export class NgxCalendarLibComponent implements OnInit, AfterViewInit {
 
   public trackBy2(index, item) {
     return item.id;
+  }
+
+  private _getRowsInMonth(): number {
+    if (
+      (isSunday(startOfMonth(this._date)) && getDaysInMonth(this._date) >= 30) ||
+      (isSaturday(startOfMonth(this._date)) && getDaysInMonth(this._date) === 31)
+    ) {
+      return 6;
+    }
+    return 5;
+  }
+
+  private _getWeekOfMonth(date: Date): number {
+    return getISOWeek(date) - getISOWeek(startOfMonth(this.date));
+  }
+
+  public setMoreEventsPopup(date: Date, events: number[]): void {
+    setTimeout(() => {
+      const height = ((this._el.nativeElement.offsetHeight - 68) / this._getRowsInMonth());
+      const row = this._getWeekOfMonth(date);
+      let column = getDay(date);
+      if (column === 0) {
+        column = 7;
+      }
+      this.moreEventsPopupVisible = true;
+      this.moreEventsPopupTop = row * height - 50 + 69;
+      this.moreEventsPopupLeft = ((column - 1) * (this._el.nativeElement.offsetWidth / 7)) - 24;
+      this.moreEventsPopupDay = this.settings.shortDayNames[column - 1];
+      this.moreEventsPopupDate = getDate(date);
+      this.moreEventsPopupEvents = this._getDisplayedEvents(events);
+    });
+  }
+
+  public closeMoreEventsPopup(): void {
+    this.moreEventsPopupVisible = false;
+  }
+
+  private _formatTwoDays(date1: Date, date2: Date): string {
+    if (!isEqual(date1, date2)) {
+      let year = '';
+      let month = '';
+      if (getYear(date1) !== getYear(date2)) {
+        year = format(date2, ' YYYY.');
+      }
+      if (getMonth(date1) !== getMonth(date2) || year !== '') {
+        month = ' ' + this.settings.monthNames[getMonth(date2)];
+      }
+      return format(date1, 'YYYY. ') + this.settings.monthNames[getMonth(date1)] + format(date1, ' D -')
+        + year + month + format(date2, ' D');
+    } else {
+      return format(date1, 'YYYY. ') + this.settings.monthNames[getMonth(date1)] + format(date1, ' D');
+    }
+  }
+
+  public setEventDetailsPopup(id: number, click): void {
+    setTimeout(() => {
+      const event = this._getEvent(id);
+      const boundingRect = click.target.getBoundingClientRect();
+      const calendarBoundingRect = this._el.nativeElement.getBoundingClientRect();
+      this.eventDetailsPopupVisible = true;
+      this.eventDetailsPopupTitle = event.title;
+      this.eventDetailsPopupDate = this._formatTwoDays(event.startDate, event.endDate);
+      this.eventDetailsPopupDescription = event.description;
+      this.eventDetailsPopupColor = event.color;
+      this.eventDetailsPopupTop = boundingRect.y - calendarBoundingRect.y;
+      if (document.body.clientWidth - boundingRect.right < 320) {
+        if (boundingRect.x < 320) {
+          this.eventDetailsPopupLeft = calendarBoundingRect.width / 2 - 150;
+        } else {
+          this.eventDetailsPopupLeft = boundingRect.x - 310 - calendarBoundingRect.x;
+        }
+      } else {
+        this.eventDetailsPopupLeft = boundingRect.right + 10 - calendarBoundingRect.x;
+      }
+    });
+  }
+
+  public closeEventDetailsPopup(): void {
+    setTimeout(() => {
+      this.eventDetailsPopupVisible = false;
+    });
+  }
+
+  @HostListener('document:click', ['$event']) clickout(event) {
+    let eventDetails = false;
+    let moreEvents = false;
+    for (let i = 0; i < event.path.length; i++) {
+      const element = event.path[i];
+      if (this.eventDetailsPopupVisible && element === this.eventDetailsPopupElement.nativeElement) {
+        if (this.moreEventsPopupVisible) {
+          moreEvents = true;
+        }
+        eventDetails = true;
+      }
+      if (this.moreEventsPopupVisible && element === this.moreEventsPopupElement.nativeElement) {
+        moreEvents = true;
+      }
+
+      if (element.parentElement) {
+        if (element.parentElement.classList.contains('event')
+          && !element.parentElement.classList.contains('more')
+          && !element.parentElement.classList.contains('popup-event')) {
+          eventDetails = true;
+          moreEvents = false;
+        }
+        if (element.parentElement.classList.contains('event')
+          && element.parentElement.classList.contains('more')) {
+          eventDetails = false;
+          moreEvents = true;
+        }
+        if (element.parentElement.classList.contains('event')
+          && !element.parentElement.classList.contains('more')
+          && element.parentElement.classList.contains('popup-event')) {
+          eventDetails = true;
+          moreEvents = true;
+        }
+      }
+    }
+    if (!eventDetails) {
+      this.eventDetailsPopupVisible = false;
+    }
+    if (!moreEvents) {
+      this.moreEventsPopupVisible = false;
+    }
   }
 }
